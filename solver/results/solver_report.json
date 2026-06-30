@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "timestamp": "2026-06-30T13:43:21",
+    "seeds": 1500,
+    "decision_runs": 700,
+    "elapsed_s": 45.2
+  },
+  "decision_depth": {
+    "n_decisions": 12600,
+    "pareto_ge2_pct": 0.9671,
+    "dominant_le1_pct": 0.0329,
+    "median_ev_spread": 0.0251,
+    "ev_spread_in_band_pct": 0.0404,
+    "working_set_le6_pct": 0.6825,
+    "median_working_set": 5.0,
+    "verdict_pareto": "GREEN",
+    "verdict_foundation": "GREEN",
+    "verdict_ev_band": "RED"
+  },
+  "s4_mana_dominance": {
+    "builds": {
+      "0F_3P": {
+        "winrate": 0.0013,
+        "mean_margin": -0.172,
+        "sharpe": -2.595
+      },
+      "3F_0P": {
+        "winrate": 0.0,
+        "mean_margin": -0.166,
+        "sharpe": -4.01
+      },
+      "2P_1F": {
+        "winrate": 0.488,
+        "mean_margin": 0.004,
+        "sharpe": 0.043
+      },
+      "1P_2F": {
+        "winrate": 0.0013,
+        "mean_margin": -0.152,
+        "sharpe": -3.221
+      },
+      "filo_x2F": {
+        "winrate": 0.3347,
+        "mean_margin": -0.035,
+        "sharpe": -0.405
+      },
+      "bosque_mix": {
+        "winrate": 0.0033,
+        "mean_margin": -0.226,
+        "sharpe": -2.812
+      }
+    },
+    "top_winrate": 0.488,
+    "wr_gap_top2": 0.1533,
+    "n_viable": 2,
+    "verdict": "YELLOW"
+  },
+  "s5_threshold": {
+    "bands": {
+      "chica": {
+        "median": 1.276,
+        "p10": 1.156,
+        "p90": 1.408
+      },
+      "grande": {
+        "median": 1.071,
+        "p10": 0.947,
+        "p90": 1.209
+      },
+      "envite": {
+        "median": 1.028,
+        "p10": 0.892,
+        "p90": 1.546
+      }
+    },
+    "overall_median": 1.147,
+    "overall_p10": 0.941,
+    "overall_p90": 1.432,
+    "verdict": "GREEN"
+  },
+  "expert_test": {
+    "means_by_policy": {
+      "greedy_1ply": 973.35,
+      "lookahead_1": 983.94,
+      "lookahead_2": 987.47,
+      "lookahead_3": 989.02
+    },
+    "total_gain_pct": 0.0161,
+    "gain_k2_to_k3": 0.0016,
+    "monotonic": true,
+    "verdict": "YELLOW"
+  },
+  "s7_ftue_mastery": {
+    "ftue_pareto_ge2": 0.9675,
+    "mastery_pareto_ge2": 0.9669,
+    "verdict": "GREEN"
+  },
+  "verdicts": {
+    "pareto": "GREEN",
+    "foundation": "GREEN",
+    "ev_band": "RED",
+    "s4_mana": "YELLOW",
+    "s5_threshold": "GREEN",
+    "expert": "YELLOW",
+    "s7": "GREEN"
+  },
+  "overall": "YELLOW — foso VALIDADO (decisión real, no puzzle); amarillos = calibración de balance fino a terminar con telemetría/playtest humano. Proceder al prototipo."
+}
