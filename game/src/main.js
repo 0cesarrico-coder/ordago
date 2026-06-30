@@ -5,10 +5,13 @@ import {
   PALO_GLYPH, NOMBRE_VALOR, PACTOS, FULLERIAS, BUILD_INICIAL, TRAMPAS, nombreCarta,
 } from './content.js';
 import * as fx from './fx.js';
+import * as audio from './audio.js';
 
 const app = document.getElementById('app');
 let game = null;
 let sel = { handIdx: null, mesa: new Set() };
+let prevScore = 0;          // para el count-up de la barra
+let cheatShown = false;     // beat de "trampa rota" mostrado una vez por Envite
 
 // seed: de la URL (?d=seed para el deep-link §8.3) o aleatorio.
 function pickSeed() {
@@ -29,7 +32,11 @@ function screenIntro() {
       <button class="btn primary" id="play" style="max-width:240px">Repartir cartas</button>
       <p class="small">Semilla #${seedShown}</p>
     </div>`;
-  document.getElementById('play').onclick = () => { game.startApuesta(0); renderPlay(); };
+  document.getElementById('play').onclick = () => {
+    audio.arm(); audio.resume(); audio.sfx.firma();   // arma audio en el 1.er gesto (§19.4)
+    prevScore = 0; cheatShown = false;
+    game.startApuesta(0); renderPlay();
+  };
 }
 
 function renderPlay() {
@@ -41,7 +48,8 @@ function renderPlay() {
     <div class="hud">
       <div class="hud-top">
         <span class="apuesta-nom">${s.apuesta.nombre}</span>
-        <span class="reales">Reales: <b>${s.reales}</b> 🪙</span>
+        <span><button id="mute" class="mutebtn">${audio.isEnabled() ? '🔊' : '🔇'}</button>
+          <span class="reales">Reales: <b>${s.reales}</b> 🪙</span></span>
       </div>
       <div class="barra-wrap"><div class="barra" style="width:${pct}%"></div>
         <div class="barra-txt">${Math.round(s.scoreApuesta)} / ${s.umbral}</div></div>
@@ -53,6 +61,8 @@ function renderPlay() {
     </div>
     ${s.enEnvite ? trampaBanner(t) : ''}
     ${manaSlots(s.build)}
+    ${(s.apuestaIndex === 0 && s.manosLeft === s.apuesta.manos)
+      ? '<div class="comojugar">Toca una carta de tu <b>mano</b>, luego cartas de la <b>Mesa</b> que sumen <b>15</b> con ella → <b>ESCOBA</b>.</div>' : ''}
     <div class="felt">
       <span class="felt-label">LA MESA DEL DIABLO</span>
       <div class="mesa" id="mesa">${s.mesa.map((c, i) =>
@@ -71,6 +81,27 @@ function renderPlay() {
 
   wirePlay();
   updateSuma();
+  // count-up de la barra desde el score previo (juice §10)
+  countUpBar(prevScore, s.scoreApuesta, s.umbral);
+  prevScore = s.scoreApuesta;
+  // beat "le hiciste trampa al Diablo" cuando entras al Envite con la Trampa ya rota (§7.6)
+  if (s.enEnvite && t.roto && !cheatShown) {
+    cheatShown = true;
+    audio.sfx.cheat();
+    fx.toast('😏 Rompiste la Trampa del Diablo');
+  }
+}
+
+function countUpBar(from, to, umbral) {
+  const txt = document.querySelector('.barra-txt');
+  if (!txt || from === to) return;
+  const t0 = performance.now(), dur = 420;
+  (function step(t) {
+    const k = Math.min(1, (t - t0) / dur);
+    const v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); // ease-out cubic
+    txt.textContent = `${v} / ${umbral}`;
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
 }
 
 function trampaBanner(t) {
@@ -118,17 +149,19 @@ function wirePlay() {
   document.querySelectorAll('.carta').forEach((el) => {
     el.onclick = () => {
       const zona = el.dataset.zona, i = +el.dataset.i;
-      if (zona === 'hand') { sel.handIdx = (sel.handIdx === i ? null : i); sel.mesa.clear(); }
+      if (zona === 'hand') { sel.handIdx = (sel.handIdx === i ? null : i); sel.mesa.clear(); audio.sfx.select(); }
       else {
         const s = game.getState();
         if (oroBloqueado(s.mesa[i], s.tctx)) return; // bloqueada por Trampa
-        if (sel.mesa.has(i)) sel.mesa.delete(i); else sel.mesa.add(i);
+        if (sel.mesa.has(i)) sel.mesa.delete(i); else { sel.mesa.add(i); audio.sfx.tap(); }
       }
       refreshSelection();
     };
   });
   document.getElementById('escoba').onclick = onEscoba;
   document.getElementById('pasar').onclick = onPasar;
+  const mb = document.getElementById('mute');
+  if (mb) mb.onclick = () => { audio.setEnabled(!audio.isEnabled()); mb.textContent = audio.isEnabled() ? '🔊' : '🔇'; };
 }
 
 function refreshSelection() {
@@ -169,14 +202,20 @@ function updateSuma() {
 }
 
 function onEscoba() {
+  const escEl = document.getElementById('escoba');
   const res = game.jugarEscoba(sel.handIdx, [...sel.mesa]);
   if (!res.ok) return;
+  audio.sfx.barrido(res.escobaLimpia);
   fx.escobaBurst(res.score, res.escobaLimpia);
-  if (res.score > 0) fx.floatScore(document.getElementById('escoba'), `+${Math.round(res.score)}`,
-    res.escobaLimpia ? '#7fd18a' : '#e8b13a');
-  if (res.nulaT3) fx.floatScore(document.getElementById('escoba'), 'NULA (Trampa)', '#e0617a');
+  // Puntos×Suerte: el número grande es CONSECUENCIA, no mult en el vacío (§7.7)
+  if (res.score > 0) {
+    fx.floatScore(escEl, `${Math.round(res.puntos)}×${res.suerte.toFixed(1)} = +${Math.round(res.score)}`,
+      res.escobaLimpia ? '#7fd18a' : '#e8b13a');
+    if (res.escobaLimpia) fx.toast('🧹 ¡Escoba limpia! Mesa vacía');
+  }
+  if (res.nulaT3) fx.floatScore(escEl, 'NULA (Trampa del Diablo)', '#e0617a');
   sel = { handIdx: null, mesa: new Set() };
-  setTimeout(() => afterAction(res), 280);
+  setTimeout(() => afterAction(res), 300);   // hit-stop breve (game-feel)
 }
 function onPasar() {
   if (sel.handIdx === null) { fx.toast('Elige qué carta dejas en la Mesa'); return; }
@@ -187,9 +226,9 @@ function onPasar() {
 
 function afterAction(res) {
   const st = game.status;
-  if (st === 'won') return renderWin();
-  if (st === 'lost') return renderLose();
-  if (st === 'apuesta_won') return renderCantina(res);
+  if (st === 'won') { audio.sfx.firma(); return renderWin(); }
+  if (st === 'lost') { audio.sfx.lose(); return renderLose(); }
+  if (st === 'apuesta_won') { audio.sfx.coin(); cheatShown = false; prevScore = 0; return renderCantina(res); }
   renderPlay();
 }
 
@@ -230,7 +269,7 @@ function renderCantina() {
     fx.toast('Ahora toca la ranura a reemplazar');
     app.querySelectorAll('.slot[data-slot]').forEach((sl) => sl.onclick = () => {
       if (!pendiente) return;
-      if (game.equipar(pendiente.id, +sl.dataset.slot, pendiente.costo)) { renderCantina(); }
+      if (game.equipar(pendiente.id, +sl.dataset.slot, pendiente.costo)) { audio.sfx.coin(); fx.toast('Equipado ✓'); renderCantina(); }
       else fx.toast('Reales insuficientes');
     });
   });

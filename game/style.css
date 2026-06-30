@@ -28,6 +28,10 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .barra-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-size: .8rem; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
 .hud-bottom { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); }
+.mutebtn { background: transparent; font-size: 1rem; padding: 0 6px; opacity: .8; }
+.comojugar { margin: 2px 0 0; padding: 7px 10px; border-radius: 8px; background: #2a1a24cc;
+  border: 1px dashed #6a4a5a; color: var(--muted); font-size: .8rem; text-align: center; line-height: 1.35; }
+.comojugar b { color: var(--oro); }
 .manos b { color: var(--ink); }
 
 /* ---------- Trampa banner ---------- */
