@@ -1,0 +1,33 @@
+# ÓRDAGO — Matriz de consenso del Multi-Debate (todos los hallazgos)
+
+> Clasificación: **Consenso 3/3** · **Mayoría 2/3** · **Contestado** (irreducible, ambos lados) · **Único** (1 asiento).
+> Asientos: **Opus** (Diseño/Sistemas+Lentes) · **Gemini** (Valor+Voz del Jugador) · **Meta AI** (Fantasía/Estética+Red Team).
+> Confianza por afirmación 🟢/🟡/⚪. Fuente del estado de cierre: referee-r3 (CONVERGED: 8 consensus / 1 contested / 4 flipped).
+
+| # | Hallazgo | Clasificación | Asiento(s) que lo sostienen | Carta/lente | Conf. | Nota |
+|---|---|---|---|---|---|---|
+| 1 | Moat real es CULTURAL: baraja española + Las Matas (§7.5) está ENTREGADA y es la propuesta más sólida hoy | **Consenso 3/3** | Opus (F1), Gemini (F2), Meta AI (F2) | A3🟡, A5🟡 | 🟡 | Estable desde R2. Validar willingness-to-pay en cohorte propia (§19) |
+| 2 | "Le hice trampa al Diablo" está HUECA: el tema no cambia el verbo (A4 no entregada) | **Consenso 3/3** | Opus (Falla #2), Gemini, Meta AI (Falla #1) | A4🟢🟡 | 🟢 | Hallazgo más robusto del panel; "Diablo = leaderboard con sombrero" |
+| 3 | Pactos Oscuros = "Jokers renombrados" salvo costo/fórmula visible | **Consenso 3/3** | Opus (cond.), Gemini, Meta AI | A1🟢🟡, M1·LD7🟢 | 🟢🟡 | Meta AI lo aterriza: cada Pacto quema una Fullería |
+| 4 | Diablo Fantasma (§4/§8) es cuña async genuina (tema=mecánica) pero falta bucketing/MMR | **Consenso 3/3** | Opus (F2), Gemini (F1), Meta AI (F3/CRUX 5) | LD6🟢/🟡, LD3🟢 | 🟡 | Los 3 piden bucket leaderboards; sin gap cerrable (Festinger) → desaliento |
+| 5 | **CRUX 1** — La Mesa (§7.3) DEBE tener poblador ACTIVO; sin él "sumar 15" colapsa a Blackjack de la propia mano | **Consenso 3/3 (FLIPPED de contestado en R2)** | Opus (cierra por lógica de sistemas), Gemini ("no negociable"), Meta AI (dato mercado Escoba) | A1🟢🟡 (emergencia bilateral) | 🟡 | Origen: golpe de Gemini FF2 en R1; Opus elevó la falla raíz en R2 |
+| 6 | **CRUX 2** — La fricción del verbo es ESTRUCTURAL (falta trade-off), no perceptual | **Consenso 3/3 (FLIPPED)** | Opus, Gemini (concede y abandona su causa perceptual), Meta AI | A1🟢🟡, LD4🟡 | 🟢 | Se conserva solo legibilidad de valores (8/9/10 grandes, A5🟡), no la solución |
+| 7 | **CRUX 3** — "Trampa" necesita verbo PROPIO con tell/riesgo (Fullerías); no basta Pactos pasivos | **Consenso 3/3 (FLIPPED)** | Opus (sintetiza en UN sistema dual Trampa↔Fullería), Gemini, Meta AI | A4🟢🟡, A1🟢🟡 | 🟡 | Síntesis Opus R3 mata la objeción de barroquismo (no 3 ejes, 1 sistema dual) |
+| 8 | KILL: UI que auto-resalta/resuelve los 15 (Gemini R1) — eutanasia del core, viola A1/LD4 | **Consenso 3/3 (FLIPPED)** | Opus, Gemini (su autor original la retiró en R2), Meta AI | A1🟢🟡, LD4🟡 | 🟢 | "Confesión de que tu verbo no tiene juego" (Meta AI) |
+| 9 | **CRUX 4** — Estética Posada/Día-de-Muertos (negro+oro-vela): ¿ACTIVO (mito <1s, A3) o PASIVO (fatiga/apropiación boutique)? | **Contestado (irreducible)** | Lado A: Opus + Gemini (activo neto) · Lado B: Meta AI (pasivo/riesgo, data L1 plataforma) | A3🟡, A5🟡 | 🟡 | Los 3 acuerdan: lo zanja un test A/B de feed de 3s, no otra ronda. NO apostar arte antes |
+| 10 | Verbo core "sumar 15" es legible/onboarding casi-nulo para hispano, NO profundo como espacio de decisión | **Consenso 3/3** | Opus (Prop #3), Gemini (FF1), Meta AI | A5🟡 (sí), A1🟢🟡 (no) | 🟡 | Original de superficie aritmética, no de profundidad de decisión |
+| 11 | Cobertura emocional: Action-Social y Mastery-Achievement cubiertos; Immersion-Creativity/Expression es el HUECO | **Mayoría 2/3** | Opus (Falla #3, explícito), Meta AI ("flojo en Immersion-Creativity") | LD3🟢, LD4🟡 | 🟡/⚪ | Gemini no lo formula como hueco de cobertura; no contradicho → consolidado por mayoría |
+| 12 | Disonancia de índices para el global: Sota/Caballo/Rey (8/9/10) rompen el modelo mental; barrera de onboarding no-hispano | **Mayoría 2/3** | Gemini (FF3), Meta AI (jugador global ⚪) | A5🟡 | ⚪→🟡 | Opus lo concede en R3 como pieza barata (rediseño de naipes); cura = índices 8/9/10 grandes |
+| 13 | Submission/relax "una mano más" está entregado por estructura pero es genérico del género (Balatro ya lo tiene) | **Único (Opus)** | Opus (Prop #7) | LD4🟡 | 🟡 | Valor real, no diferencial |
+| 14 | Afinidades de palo (Oros=economía, Espadas=mult) son HUECAS hoy: §19-dec.5 las admite indefinidas | **Único (Opus)** | Opus (Prop #8) | A1🟢🟡, LD4🟡 | 🟡/⚪ | Si son "ligeras" = color-coding sin profundidad de build |
+| 15 | Jugadas (§7.4) son bonus aditivos, no ramas mutuamente excluyentes → no producen build-as-signature | **Mayoría 2/3** | Opus (Falla #1/Rec), Meta AI (Rec R3: "elegir arquetipo cierra otros") | A1🟢🟡 | 🟡/⚪ | Se subsume: tu set de Fullerías ES tu firma (síntesis Opus R3) |
+| 16 | El Envite (§7.10) como boss fight con reglas modificadoras es una fortaleza (rompe builds dominantes) | **Único (Gemini)** | Gemini (F3) | A1🟢🟡 | 🟡 | Coherente con el vehículo del sistema dual (la Trampa vive en el Envite) |
+| 17 | "Doble ola" de mercado (nativo + exótico global) es HUECA: el global enfrenta fricción cognitiva alta sin payoff de profundidad | **Mayoría 2/3** | Gemini (Prop #4), Meta AI (jugador global ⚪) | A5🟡 | ⚪ | Opus matiza: el moat global debe ser la fantasía-trampa + Diablo + estética, NO la baraja en sí |
+| 18 | Para el segmento global (USA Tier-1, eCPM alto), el sistema dual Trampa↔Fullería NO es opcional: es el único valor diferencial | **Único (Opus)** | Opus (R3, lectura cruzada) | A1🟢🟡, A4🟢🟡 | 🟡/⚪ | Sin él, ÓRDAGO = nicho nostálgico hispano con techo bajo |
+| 19 | Test/kill compartido: prototipo de papel de UNA Manga (§14), A/B, recall "le hice trampa" ≥60%, ≥2 builds | **Consenso 3/3** | Opus, Gemini, Meta AI (los 3 proponen variantes del mismo test) | A1🟢🟡, A4🟢🟡 | 🟡 | Corre en WhatsApp LATAM (CAC~0), cero arte, un fin de semana |
+
+**Conteo:** Consenso 3/3 = 8 (#1–8 cruxes + #10, #19 → 10 con los compartidos) · Mayoría 2/3 = 4 (#11, #12, #15, #17) · Contestado = 1 (#9) · Único = 4 (#13, #14, #16, #18).
+
+**Piso ético (M1/LD7) — inviolable, respetado por el diseño propuesto:** los Pactos con costo transparente y la trampa con saciedad alcanzable (tomas la Fullería, pagas el riesgo, cierras el gap, estado terminal) caen del lado SANO de LD7🟢. Ninguna propuesta superviviente se basa en FOMO, timers o mito-peaje (M1🟢🟡: saldo neto positivo). El KILL del auto-solver de UI también protege la agencia del jugador (LD4).
+
+**Nota de fidelidad:** no se introdujo ningún dato de mercado que ninguna IA aportara; toda señal empírica (engagement, CTR, recall) queda marcada "validar en cohorte propia". El único hallazgo apoyado en data L1 de plataforma (CRUX 4, Meta AI) se presenta como **contestado**, no como consenso, respetando el veredicto del referee.

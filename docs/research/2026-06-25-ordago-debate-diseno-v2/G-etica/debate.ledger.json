@@ -1,0 +1,12 @@
+{
+  "attempts": [
+    {
+      "iteration": 2,
+      "score": 35,
+      "verdict": "CONVERGED",
+      "metrics": {},
+      "artifact": "referee-r2.md",
+      "note": "R2 cross-review"
+    }
+  ]
+}

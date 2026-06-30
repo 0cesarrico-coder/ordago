@@ -1,0 +1,30 @@
+{
+  "attempts": [
+    {
+      "iteration": 0,
+      "score": 79,
+      "verdict": "CONCERNS",
+      "metrics": {
+        "exclusions": 0,
+        "minimizations": 2,
+        "replacements": 0,
+        "reclassifications": 0
+      },
+      "artifact": "report.iter-0.md",
+      "note": "baseline; 2 minimizaciones menores"
+    },
+    {
+      "iteration": 1,
+      "score": 100,
+      "verdict": "PASS",
+      "metrics": {
+        "exclusions": 0,
+        "minimizations": 0,
+        "replacements": 0,
+        "reclassifications": 0
+      },
+      "artifact": "report.iter-1.md",
+      "note": "PASS — 2 minimizaciones corregidas"
+    }
+  ]
+}

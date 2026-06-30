@@ -1,0 +1,11 @@
+{
+  "question": "Multi-debate adversarial de diseño/valor sobre el GDD macro de ÓRDAGO (protocolo prompt maestro v1.1, salida §7-bis)",
+  "eje": "diseño + valor (NO negocio)",
+  "fecha": "2026-06-24",
+  "ias": { "opus": "claude-opus-4-8 (max effort)", "gemini": "gemini-3.5-flash (thinking high)", "meta_ai": "web (playwright MCP, razonamiento)" },
+  "roles": { "opus": "Diseño/Sistemas + Lentes", "gemini": "Propuesta de Valor + Voz del Jugador", "meta_ai": "Fantasía/Tema/Estética + Red Team" },
+  "rondas": ["R1 lectura a ciegas", "R2 cross-review", "R3 counter-response/cierre"],
+  "referee": { "verdict": "CONVERGED", "score": 77, "metrics": {"contested":1,"flipped":4,"consensus":8,"total":9} },
+  "sintesis_loop": { "target": 85, "max_iters": 3, "iterations": [0,1,2], "scores": [49,79,79], "best_iteration": 2, "final_score": 79, "verdict_final": "CONCERNS", "stop_condition": "max_iters + no_progress (cap CONCERNS); única marca restante = downgrade de confianza justificado" },
+  "status": "completed"
+}

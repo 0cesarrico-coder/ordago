@@ -1,0 +1,43 @@
+{
+  "attempts": [
+    {
+      "iteration": 0,
+      "score": 49,
+      "verdict": "FAIL",
+      "metrics": {
+        "exclusions": 1,
+        "minimizations": 1,
+        "replacements": 1,
+        "reclassifications": 0
+      },
+      "artifact": "report.iter-0.md",
+      "note": "baseline — borró cifras Meta/Gemini, minimizó iconografía"
+    },
+    {
+      "iteration": 1,
+      "score": 79,
+      "verdict": "CONCERNS",
+      "metrics": {
+        "exclusions": 0,
+        "minimizations": 2,
+        "replacements": 0,
+        "reclassifications": 0
+      },
+      "artifact": "report.iter-1.md",
+      "note": "3 instancias corregidas; quedan 2 minimizations"
+    },
+    {
+      "iteration": 2,
+      "score": 79,
+      "verdict": "CONCERNS",
+      "metrics": {
+        "exclusions": 0,
+        "minimizations": 1,
+        "replacements": 0,
+        "reclassifications": 0
+      },
+      "artifact": "report.iter-2.md",
+      "note": "2 minimizations corregidas; queda 1 downgrade de confianza justificado (Matas). No-progress numerico (cap CONCERNS)."
+    }
+  ]
+}

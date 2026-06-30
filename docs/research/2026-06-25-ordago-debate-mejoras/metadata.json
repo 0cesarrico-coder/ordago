@@ -1,0 +1,9 @@
+{
+  "etapa": "2 — debate de mejoras (multi-ai-research)",
+  "fecha": "2026-06-25",
+  "ias": {"opus":"claude-opus-4-8 max","gemini":"gemini-3.5-flash high","meta_ai":"web playwright slot-2"},
+  "rondas": ["R1","R2","R3"],
+  "debate_loop": {"scores":[null,62,83],"final_verdict":"CONVERGING","contested_final":1,"stop":"target_reached (83>=80)"},
+  "synthesis_loop": {"target":85,"iterations":[0,1],"scores":[79,100],"best":1,"verdict_final":"PASS","stop":"target_reached"},
+  "status":"completed"
+}

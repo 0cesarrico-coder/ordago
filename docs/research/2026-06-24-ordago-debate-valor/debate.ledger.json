@@ -1,0 +1,17 @@
+{
+  "attempts": [
+    {
+      "iteration": 3,
+      "score": 77,
+      "verdict": "CONVERGED",
+      "metrics": {
+        "contested": 1,
+        "flipped": 4,
+        "consensus": 8,
+        "total": 9
+      },
+      "artifact": "referee-r3.md",
+      "note": "R3 cierre — CONVERGED, solo estética irreducible"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "attempts": [
+    {
+      "iteration": 0,
+      "score": 55,
+      "verdict": "CONCERNS",
+      "metrics": {},
+      "artifact": "META-bias-audit.md",
+      "note": "meta-sintesis iter-0"
+    },
+    {
+      "iteration": 1,
+      "score": 88,
+      "verdict": "PASS",
+      "metrics": {},
+      "artifact": "META-bias-audit-iter1.md",
+      "note": "meta-sintesis iter-1 corregida"
+    }
+  ]
+}

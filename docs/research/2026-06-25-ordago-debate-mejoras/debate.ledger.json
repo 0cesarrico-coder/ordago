@@ -1,0 +1,30 @@
+{
+  "attempts": [
+    {
+      "iteration": 2,
+      "score": 62,
+      "verdict": "CONVERGING",
+      "metrics": {
+        "contested": 3,
+        "flipped": 6,
+        "consensus": 11,
+        "total": 15
+      },
+      "artifact": "referee-r2.md",
+      "note": "cross-review; 3 cruxes vivos"
+    },
+    {
+      "iteration": 3,
+      "score": 83,
+      "verdict": "CONVERGING",
+      "metrics": {
+        "contested": 1,
+        "flipped": 2,
+        "consensus": 8,
+        "total": 9
+      },
+      "artifact": "referee-r3.md",
+      "note": "2 cruxes cerrados; queda banda EV (numero tuneable, a falsar por solver+test)"
+    }
+  ]
+}

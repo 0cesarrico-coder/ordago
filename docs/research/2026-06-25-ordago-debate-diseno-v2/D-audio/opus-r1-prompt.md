@@ -1,0 +1,35 @@
+# CLÚSTER D — "Audio como sistema de orden superior" · RONDA 1 · Asiento OPUS
+
+## Tu rol
+Eres **Diseñador de Sistemas** con foco en **audio como capa de ESTADO y de ACCESIBILIDAD** (no como polish final). Una de 3 IAs que investigan el mismo clúster; las otras son Gemini (estratega de valor/referentes) y Meta AI (data L1 de plataforma). **Lidera con lo que SOLO tú aportas:** diseño de sistemas falsable, anclado a las cartas D3 (audio de orden superior), 09 (juice/game-feel, U-invertida de Kao) y 12 (límites éticos / Dignity Gate). Razonamiento profundo + web research para benchmarks concretos.
+
+## El juego (no tienes el GDD — esto es lo que necesitas)
+**ÓRDAGO** es un roguelike deckbuilder con baraja española; fantasía: *"le haces trampa al Diablo"*. Foso de gameplay = un **sistema dual** Trampa↔Fullería: el Diablo impone Trampas (reglas que alteran el verbo: "suma 13", "Oros no cuentan"); tú juegas **Fullerías** (maña que rompe la regla por una mano) en un **arco de 3 tiempos**: ANTES sube una **barra de Sospecha** (riesgo decidible), DURANTE 1-2 s (el Diablo entrecierra los ojos), DESPUÉS = **cuela / near-miss / te pilla**. Modelo: **premium B2P en Steam ($14.99), sin MTX**, + demo web jugable ultraligera como mitad física del artefacto-puente. Mercado: LATAM + USA + hispanos-USA (sweet spot). Adquisición canónica: deep-link → demo web móvil → wishlist Steam; objeto-puente PRIMARIO = un **sticker-imagen** que cruza WhatsApp (stickers 56% vs grids 12%, data L1).
+
+**La carta D3 (lo que ya está comprometido):** el audio es FOSO, no polish — (1) una **firma sonora** de 2-3 notas ≤3 s (sonic branding, earworm de Jakubowski 2017, efecto Zeigarnik) + (2) un **grito imitable** ≤1.5 s reproducible con la boca = el foso más barato/perdurable y un vector de transmisión (nota de voz / trending sound). Caveat ya verificado: Chrome/Safari móvil BLOQUEAN autoplay; mucha sesión LATAM es muda → el grito necesita GEMELO VISUAL (sticker + onomatopeya copiable). 09: el juice tiene techo (U-invertida; el extremo marea). 12: INMI/Zeigarnik operan casi sin consentimiento → el audio es ético para identidad/pertenencia, predatorio si engancha al miedo de perder.
+
+## Los 6 huecos del clúster D (resumen autocontenido — §GDD / por qué NO es clase mundial / fix propuesto)
+1. **#22 — Firma muere en 1er contacto (§10.1+§15/§8.3).** El canal canónico (deep-link→demo web móvil) es MUDO en el momento de máxima carga de marca (autoplay bloqueado). *Fix:* el **primer TAP dispara la firma**; linter `first_tap_arms_audio` (el build falla si depende de autoplay); KPI `firma_heard_first_session`.
+2. **#23 — El sticker PRIMARIO viaja MUDO y sin grito imitable (§8.3+§10.1).** El objeto que MÁS cruza el grafo no porta el activo sonoro ni su gemelo visual. *Fix:* grito como activo DUAL — **gemelo visual onomatopéyico** (transcripción tipográfica Posada) estampado GRANDE en el sticker, copiable en caption; campo `grito_glifo` en RunDigest. Kill: ¿el receptor REPITE el grito tras ver el sticker mudo?
+3. **#31/#21/#34 — El grito no se versiona por nodo cultural (§10.1+§11/§8).** Firma melódica GLOBAL, pero el grito (lingüístico) es mono-MX y no usa la infra `cultural_packs[]` que el GDD ya construyó. *Fix:* grito como campo LOCALIZABLE en `cultural_packs[]` (grito.mx, grito.caribe…); RunDigest selecciona por nodo del compartidor; "test de chat de voz" POR NODO.
+4. **#32/#13/#33 — El audio NO porta el estado del sistema dual: es branding, no alfabetización (§7.6e+§10/§10.1).** El corazón (sistema dual) se resuelve 100% VISUAL; falta canal sonoro de estado (audio decodifica más rápido que texto para baja alfabetización). *Fix:* capa sonora de estado: (1) **leitmotiv sostenido** por Trampa activa (no one-shot); (2) **textura creciente** atada a Sospecha (límite ético); (3) **3 firmas** cuela/near-miss/pillado. Kill: identificar Trampa+resultado con ojos cerrados.
+5. **#67 — Tells de juego en audio sin redundancia para sordos (§10.1+§7.6b).** El audio se elevó a foso pero NO se gateó la redundancia auditiva; ~5% sordos pierden el tell de estado. *Fix:* gate simétrico §11 'ninguna señal de juego vive SOLO en audio'; cada evento sonoro emite equivalente visual; subtítulos de eventos opt-on; QA 'mute total'.
+6. **#17 — Emoji-artefacto bandwidth-independent degradado a 'fallback' (§8.3).** El artefacto Unicode/emoji copiable (estilo Wordle, 0 servidor) es la red de seguridad para superficies sin preview / datos agotados, pero está relegado. *Fix:* una línea de texto/glifo client-side GARANTIZADA como red de seguridad + medir su `share_rate` por separado. (NO elevarlo a 3er canónico: choca con data L1 stickers 56% vs grids 12%.)
+
+## PREGUNTA CENTRAL
+¿Cómo entregar el **foso de audio (D3) en TODOS los touchpoints y con redundancia accesible** — primer TAP arma la firma (autoplay bloqueado, #22); grito como activo DUAL con gemelo visual en el sticker mudo (#23); grito localizable por nodo cultural (#31); audio que PORTA el estado del sistema dual (no solo branding, #32); tells sin redundancia para sordos (#67); emoji-artefacto bandwidth-independent (#17)?
+
+## Lo que tú DEBES producir (para cada uno de los 6 huecos, y para el clúster como sistema)
+Para CADA hueco, en este orden:
+- **(a) Steelman** — la versión más fuerte del fix propuesto: ¿por qué, bien diseñado, es clase mundial? Ánclalo a D3/09/12 con su nivel de confianza (🟢/🟡/⚪).
+- **(b) Ataque / mejora** — el modo de fallo real (sobre-ingeniería, choque con la U-invertida de juice #09, riesgo ético del audio #12, costo de scope en premium sin live-ops, o colisión con otro hueco). Propón la mejora.
+- **(c) Resolución de clase mundial con CRITERIOS FALSABLES** — la especificación que tú firmarías, con **invariantes verificables, linters/gates EN CÓDIGO** (doctrina: la validación va en código, no en prompts), KPIs y umbrales de kill concretos (números, no "alto"). Diseña el **gate de redundancia auditiva simétrico** (#67) y el **test ojos-cerrados** (#32) como gates de release falsables.
+- **(d) Decisión de César** — aísla el trade-off real que NO decide el debate (p.ej. cuánto presupuesto de audio de estado antes de saturar la U-invertida; si el emoji-artefacto #17 merece pipeline propio; cuántos nodos de grito al lanzamiento vs post-EA) y formúlalo como una elección binaria/acotada para él.
+
+Cierra con un **veredicto de sistema**: ¿los 6 fixes COMPONEN un "audio como sistema de orden superior" coherente, o se pisan entre sí? ¿Qué es lo PRIMERO a falsar por centavos?
+
+## Requisito de especificidad
+Cada hallazgo lleva dato concreto (número/rango/ejemplo) y confianza Alta/Media/Baja con razón. Si no tienes el dato, dilo. Usa web research para benchmarks 2025-2026 (autoplay policies de navegadores móviles, comportamiento de audio en in-app browsers de WhatsApp/IG, stickers sonoros de WhatsApp, accesibilidad WCAG para sordos en juegos). NO inventes contenido del GDD más allá del resumen de arriba.
+
+## Formato
+Markdown. Por hueco: subsección con (a)(b)(c)(d). Cierra con **Lo que sé que las otras IAs probablemente no** y **Vacíos** (qué necesitas de Gemini/Meta AI). ≤900 palabras de cuerpo analítico.
