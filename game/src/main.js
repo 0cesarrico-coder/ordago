@@ -59,6 +59,7 @@ function screenIntro() {
         ${dailyDone ? '✓ Reto del Día completado' : '🗓️ Reto del Día'}</button>
       ${rachaTxt ? `<p class="racha">${rachaTxt}</p>` : ''}
       <p class="small sem">${seedMode === 'shared' ? 'Reto recibido' : 'Semilla'} #${seedShown} · v${VERSION}</p>
+      <p class="small priv">Juego anónimo · no pedimos datos personales</p>
     </div>`;
   document.getElementById('play').onclick = () => startRun();
   document.getElementById('reto').onclick = () => {
@@ -369,16 +370,26 @@ function renderWin() {
       </div>
       <p class="small">Reta a alguien con <b>esta misma mesa</b> (misma semilla).</p>
       <div class="acciones" style="max-width:360px">
-        <button class="btn" id="copiar">📋 Copiar reto</button>
-        <button class="btn primary" id="again">Otra partida</button>
+        <button class="btn primary" id="compartir">📣 Retar a un amigo</button>
+        <button class="btn" id="again">Otra partida</button>
       </div>
     </div>`;
   document.getElementById('again').onclick = () => { track('again_click', { from: 'win' }); restart(); };
-  document.getElementById('copiar').onclick = () => {
-    track('share_click', { method: 'copy', seed: s.seed, mode: seedMode });
-    navigator.clipboard?.writeText(reto).then(() => fx.toast('¡Reto copiado! Pégalo en WhatsApp'),
-      () => fx.toast('Copia: ' + shareUrl));
-  };
+  document.getElementById('compartir').onclick = () => compartirReto(reto, shareUrl, s.seed);
+}
+
+// Compartir: menú nativo del sistema (WhatsApp/Telegram directo, motor viral LATAM) → fallback clipboard.
+function compartirReto(reto, shareUrl, seed) {
+  if (navigator.share) {
+    track('share_click', { method: 'native', seed, mode: seedMode });
+    navigator.share({ title: 'ÓRDAGO', text: reto, url: shareUrl })
+      .then(() => track('share_done', { method: 'native', seed }))
+      .catch(() => { /* el usuario canceló el sheet: no es error */ });
+    return;
+  }
+  track('share_click', { method: 'copy', seed, mode: seedMode });
+  navigator.clipboard?.writeText(reto).then(() => fx.toast('¡Reto copiado! Pégalo en WhatsApp'),
+    () => fx.toast('Copia: ' + shareUrl));
 }
 function renderLose() {
   const s = game.getState();
@@ -428,6 +439,14 @@ function restart(opts = {}) {
 fx.initCanvas();
 initAnalytics();
 installErrorCapture();
+// PWA: registra el service worker (carga repetida instantánea + offline). Silencioso si falla.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(
+      () => track('pwa_sw_ready', {}),
+      () => { /* file:// o sin soporte: el juego funciona igual */ });
+  });
+}
 track('session_start', { mode: new URLSearchParams(location.search).get('d') ? 'shared' : 'random',
   href: location.pathname });
 restart();

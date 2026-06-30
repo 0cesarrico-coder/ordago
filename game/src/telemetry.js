@@ -8,7 +8,7 @@
 //
 // Sin PII: id de cliente anónimo (uuid en localStorage), nada de nombres/emails. Apto LATAM/USA.
 
-export const VERSION = '0.4.0';            // se incrementa por release; viaja en cada evento
+export const VERSION = '0.5.0';            // se incrementa por release; viaja en cada evento
 const LS_CID = 'ordago.cid';
 const LS_BUF = 'ordago.telemetry';         // ring buffer de eventos (QA)
 const BUF_MAX = 200;
