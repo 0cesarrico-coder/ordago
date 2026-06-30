@@ -286,6 +286,8 @@ function buildArquetipo(s) {
 function renderWin() {
   const s = game.getState();
   const grito = '¡TE GANÉ, DIABLO!';
+  const shareUrl = `${location.origin}${location.pathname.replace(/game\/?$/, '')}?d=${s.seed}`.replace(/\/+\?/, '/?');
+  const reto = `😈 Le gané al Diablo en ÓRDAGO (soy ${buildArquetipo(s)}). ¿Le ganas con la misma mesa? ${shareUrl}`;
   fx.confetti();
   app.innerHTML = `
     <div class="screen">
@@ -296,12 +298,19 @@ function renderWin() {
         <span class="diablo">😈💀</span>
         <span class="grito">${grito}</span>
         <span class="linea">Soy <b>${buildArquetipo(s)}</b></span>
-        <span class="linea small">ordago.gg/d/${s.seed} — vencí al Diablo</span>
+        <span class="linea small">vencí al Diablo de esta mesa</span>
       </div>
-      <p class="small">Comparte tu ficha y reta a alguien con esta misma semilla.</p>
-      <button class="btn primary" id="again" style="max-width:240px">Otra partida</button>
+      <p class="small">Reta a alguien con <b>esta misma mesa</b> (misma semilla).</p>
+      <div class="acciones" style="max-width:360px">
+        <button class="btn" id="copiar">📋 Copiar reto</button>
+        <button class="btn primary" id="again">Otra partida</button>
+      </div>
     </div>`;
   document.getElementById('again').onclick = restart;
+  document.getElementById('copiar').onclick = () => {
+    navigator.clipboard?.writeText(reto).then(() => fx.toast('¡Reto copiado! Pégalo en WhatsApp'),
+      () => fx.toast('Copia: ' + shareUrl));
+  };
 }
 function renderLose() {
   const s = game.getState();
