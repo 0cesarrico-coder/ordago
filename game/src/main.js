@@ -6,37 +6,75 @@ import {
 } from './content.js';
 import * as fx from './fx.js';
 import * as audio from './audio.js';
+import { track, initAnalytics, installErrorCapture, VERSION } from './telemetry.js';
 
 const app = document.getElementById('app');
 let game = null;
 let sel = { handIdx: null, mesa: new Set() };
 let prevScore = 0;          // para el count-up de la barra
 let cheatShown = false;     // beat de "trampa rota" mostrado una vez por Envite
+let seedMode = 'random';    // 'random' | 'daily' | 'shared' — origen de la semilla (telemetría)
+let runStartTs = 0;         // marca de inicio de run (duración real de sesión de juego)
+let coachShown = false;     // coach-mark de primera selección mostrado (onboarding)
 
-// seed: de la URL (?d=seed para el deep-link §8.3) o aleatorio.
+// seed: de la URL (?d=seed para el deep-link §8.3) o aleatorio. Setea seedMode (telemetría).
 function pickSeed() {
   const u = new URLSearchParams(location.search).get('d');
-  if (u && /^\d+$/.test(u)) return parseInt(u, 10) >>> 0;
+  if (u && /^\d+$/.test(u)) { seedMode = 'shared'; return parseInt(u, 10) >>> 0; }
+  seedMode = 'random';
   return (Math.floor(Math.random() * 1e9)) >>> 0;
+}
+
+// Reto del Día: semilla determinista por fecha (UTC) → todos juegan la MISMA mesa hoy (§8.3 retención).
+function dailySeed(d = new Date()) {
+  const ymd = d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  // hash estable del entero de fecha → semilla de 32 bits
+  let h = ymd >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+function todayKey(d = new Date()) {
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
 }
 
 // ---------------- Pantallas ----------------
 function screenIntro() {
+  const st = loadStreak();
+  const dailyDone = dailyDoneToday();
+  const rachaTxt = st.count > 0 ? `🔥 Racha: <b>${st.count}</b> día${st.count === 1 ? '' : 's'}` : '';
+  track('intro_view', { seedMode, dailyDone });
   app.innerHTML = `
-    <div class="screen">
+    <div class="screen intro">
       <div class="diablo-cara">😈</div>
       <h1>ÓRDAGO</h1>
-      <p><b>La partida contra el Diablo.</b><br>Suma <b>15</b> sobre la Mesa para hacer <b>Escoba</b>.
-      El Diablo hace trampa; tú le haces <b>más trampa</b> con tus Fullerías.</p>
-      <p class="small">Gana las 3 apuestas de la Manga para recuperar tu alma.</p>
-      <button class="btn primary" id="play" style="max-width:240px">Repartir cartas</button>
-      <p class="small">Semilla #${seedShown}</p>
+      <p class="tagline">Le haces <b>trampa al Diablo</b> con la baraja española.</p>
+      <ol class="comojuego">
+        <li><b>Suma 15</b> con una carta de tu mano + cartas de la Mesa → <b>Escoba</b> 🧹</li>
+        <li>El Diablo pone <b>Trampas</b>; tú las rompes con tus <b>Fullerías</b> 😏</li>
+        <li>Gana las <b>3 apuestas</b> y recupera tu alma.</li>
+      </ol>
+      <button class="btn primary big" id="play">${seedMode === 'shared' ? 'Aceptar el reto 🎴' : 'Repartir cartas 🎴'}</button>
+      <button class="btn ghost" id="reto" ${dailyDone ? 'disabled' : ''}>
+        ${dailyDone ? '✓ Reto del Día completado' : '🗓️ Reto del Día'}</button>
+      ${rachaTxt ? `<p class="racha">${rachaTxt}</p>` : ''}
+      <p class="small sem">${seedMode === 'shared' ? 'Reto recibido' : 'Semilla'} #${seedShown} · v${VERSION}</p>
     </div>`;
-  document.getElementById('play').onclick = () => {
-    audio.arm(); audio.resume(); audio.sfx.firma();   // arma audio en el 1.er gesto (§19.4)
-    prevScore = 0; cheatShown = false;
-    game.startApuesta(0); renderPlay();
+  document.getElementById('play').onclick = () => startRun();
+  document.getElementById('reto').onclick = () => {
+    if (dailyDoneToday()) { fx.toast('Ya completaste el Reto de hoy 🔥'); return; }
+    restart({ daily: true });          // re-arma el juego con la semilla del día
+    startRun();
   };
+}
+
+function startRun() {
+  audio.arm(); audio.resume(); audio.sfx.firma();   // arma audio en el 1.er gesto (§19.4)
+  prevScore = 0; cheatShown = false; coachShown = false;
+  runStartTs = Date.now();
+  track('run_start', { seed: game.seed, mode: seedMode, build: game.build.join(',') });
+  track('bet_start', { bet: 'chica', index: 0 });
+  game.startApuesta(0); renderPlay();
 }
 
 function renderPlay() {
@@ -149,7 +187,15 @@ function wirePlay() {
   document.querySelectorAll('.carta').forEach((el) => {
     el.onclick = () => {
       const zona = el.dataset.zona, i = +el.dataset.i;
-      if (zona === 'hand') { sel.handIdx = (sel.handIdx === i ? null : i); sel.mesa.clear(); audio.sfx.select(); }
+      if (zona === 'hand') {
+        sel.handIdx = (sel.handIdx === i ? null : i); sel.mesa.clear(); audio.sfx.select();
+        // coach-mark (onboarding): la 1.ª vez que eligen carta en la 1.ª apuesta, guía a la Mesa.
+        if (!coachShown && game.apuestaIndex === 0 && sel.handIdx !== null) {
+          coachShown = true;
+          const hints = computeHints(sel.handIdx);
+          fx.toast(hints.size ? '👇 Toca las cartas verdes de la Mesa que suman 15' : '🤔 Esta no suma 15 con nada; prueba otra o Pasa');
+        }
+      }
       else {
         const s = game.getState();
         if (oroBloqueado(s.mesa[i], s.tctx)) return; // bloqueada por Trampa
@@ -205,6 +251,8 @@ function onEscoba() {
   const escEl = document.getElementById('escoba');
   const res = game.jugarEscoba(sel.handIdx, [...sel.mesa]);
   if (!res.ok) return;
+  track('escoba', { bet: game.apuesta?.id, index: game.apuestaIndex,
+    score: Math.round(res.score), clean: !!res.escobaLimpia, nula: !!res.nulaT3 });
   audio.sfx.barrido(res.escobaLimpia);
   fx.escobaBurst(res.score, res.escobaLimpia);
   // Puntos×Suerte: el número grande es CONSECUENCIA, no mult en el vacío (§7.7)
@@ -219,6 +267,7 @@ function onEscoba() {
 }
 function onPasar() {
   if (sel.handIdx === null) { fx.toast('Elige qué carta dejas en la Mesa'); return; }
+  track('pass', { bet: game.apuesta?.id, index: game.apuestaIndex });
   const res = game.pasar(sel.handIdx);
   sel = { handIdx: null, mesa: new Set() };
   afterAction(res);
@@ -226,9 +275,21 @@ function onPasar() {
 
 function afterAction(res) {
   const st = game.status;
-  if (st === 'won') { audio.sfx.firma(); return renderWin(); }
-  if (st === 'lost') { audio.sfx.lose(); return renderLose(); }
-  if (st === 'apuesta_won') { audio.sfx.coin(); cheatShown = false; prevScore = 0; return renderCantina(res); }
+  const s = game.getState();
+  if (st === 'won') {
+    track('run_won', { seed: s.seed, mode: seedMode, build: s.build.join(','), durMs: Date.now() - runStartTs });
+    onRunWon(s);
+    audio.sfx.firma(); return renderWin();
+  }
+  if (st === 'lost') {
+    track('run_lost', { bet: s.apuesta?.id, index: s.apuestaIndex,
+      score: Math.round(s.scoreApuesta), umbral: s.umbral, durMs: Date.now() - runStartTs });
+    audio.sfx.lose(); return renderLose();
+  }
+  if (st === 'apuesta_won') {
+    track('bet_won', { bet: s.apuesta?.id, index: s.apuestaIndex, score: Math.round(s.scoreApuesta) });
+    audio.sfx.coin(); cheatShown = false; prevScore = 0; return renderCantina(res);
+  }
   renderPlay();
 }
 
@@ -237,6 +298,7 @@ function renderCantina() {
   const s = game.getState();
   const ofertas = game.ofertasCantina();
   const next = game.apuestaIndex + 1;
+  track('cantina_view', { afterBet: s.apuesta?.id, reales: s.reales, nextBet: ['chica', 'grande', 'envite'][next] || '' });
   const proximaTrampa = next === 2 ? s.trampaEnvite : null;
   app.innerHTML = `
     <div class="screen">
@@ -269,11 +331,16 @@ function renderCantina() {
     fx.toast('Ahora toca la ranura a reemplazar');
     app.querySelectorAll('.slot[data-slot]').forEach((sl) => sl.onclick = () => {
       if (!pendiente) return;
-      if (game.equipar(pendiente.id, +sl.dataset.slot, pendiente.costo)) { audio.sfx.coin(); fx.toast('Equipado ✓'); renderCantina(); }
-      else fx.toast('Reales insuficientes');
+      if (game.equipar(pendiente.id, +sl.dataset.slot, pendiente.costo)) {
+        track('cantina_buy', { id: pendiente.id, tipo: pendiente.tipo, slot: +sl.dataset.slot, rompeEnvite: !!pendiente.rompeEnvite });
+        audio.sfx.coin(); fx.toast('Equipado ✓'); renderCantina();
+      } else fx.toast('Reales insuficientes');
     });
   });
-  document.getElementById('next').onclick = () => { game.startApuesta(next); renderPlay(); };
+  document.getElementById('next').onclick = () => {
+    track('bet_start', { bet: ['chica', 'grande', 'envite'][next] || ('b' + next), index: next });
+    game.startApuesta(next); renderPlay();
+  };
 }
 function nextNombre(i) { return ['La Chica', 'La Grande', 'El Envite del Diablo'][i] || ''; }
 
@@ -306,8 +373,9 @@ function renderWin() {
         <button class="btn primary" id="again">Otra partida</button>
       </div>
     </div>`;
-  document.getElementById('again').onclick = restart;
+  document.getElementById('again').onclick = () => { track('again_click', { from: 'win' }); restart(); };
   document.getElementById('copiar').onclick = () => {
+    track('share_click', { method: 'copy', seed: s.seed, mode: seedMode });
     navigator.clipboard?.writeText(reto).then(() => fx.toast('¡Reto copiado! Pégalo en WhatsApp'),
       () => fx.toast('Copia: ' + shareUrl));
   };
@@ -322,20 +390,48 @@ function renderLose() {
       <p class="small">Derrotaste ${s.apuestaIndex} ${s.apuestaIndex === 1 ? 'apuesta' : 'apuestas'} · mejor jugada de tahúr.</p>
       <button class="btn primary" id="again" style="max-width:240px">Volver a intentar</button>
     </div>`;
-  document.getElementById('again').onclick = restart;
+  document.getElementById('again').onclick = () => { track('again_click', { from: 'lose' }); restart(); };
+}
+
+// ---------------- Racha (retención local) ----------------
+const LS_STREAK = 'ordago.streak';      // { count, lastWin: 'YYYY-MM-DD', dailyDone: 'YYYY-MM-DD' }
+function loadStreak() { try { return JSON.parse(localStorage.getItem(LS_STREAK) || '{}'); } catch { return {}; } }
+function saveStreak(s) { try { localStorage.setItem(LS_STREAK, JSON.stringify(s)); } catch { /* noop */ } }
+function yesterdayKey() { const d = new Date(); d.setUTCDate(d.getUTCDate() - 1); return todayKey(d); }
+function dailyDoneToday() { return loadStreak().dailyDone === todayKey(); }
+
+// Llamado al ganar una run. Si fue el Reto del Día, avanza/renueva la racha diaria.
+function onRunWon(s) {
+  const st = loadStreak();
+  if (seedMode === 'daily') {
+    const tk = todayKey();
+    if (st.dailyDone !== tk) {
+      st.count = (st.lastWin === yesterdayKey()) ? (st.count || 0) + 1 : 1;
+      st.lastWin = tk; st.dailyDone = tk;
+      saveStreak(st);
+      track('daily_won', { streak: st.count, seed: s.seed });
+    }
+  }
 }
 
 // ---------------- Bootstrap ----------------
 let seedShown = 0;
-function restart() {
-  const seed = pickSeed(); seedShown = seed;
+function restart(opts = {}) {
+  let seed;
+  if (opts.daily) { seedMode = 'daily'; seed = dailySeed(); }
+  else { seed = pickSeed(); }       // pickSeed setea seedMode ('shared' | 'random')
+  seedShown = seed;
   game = new Game(seed, BUILD_INICIAL.slice());
   sel = { handIdx: null, mesa: new Set() };
   screenIntro();
 }
 fx.initCanvas();
+initAnalytics();
+installErrorCapture();
+track('session_start', { mode: new URLSearchParams(location.search).get('d') ? 'shared' : 'random',
+  href: location.pathname });
 restart();
 
 // exponer para smoke test / debug
 import { scorePlay } from './engine.js';
-window.__ordago = { get game() { return game; }, restart, scorePlay };
+window.__ordago = { get game() { return game; }, restart, scorePlay, dailySeed };
