@@ -5,6 +5,8 @@
   --oro: #e8b13a; --rojo: #d4495e; --azul: #6f9bd1; --verde: #6fb36f;
   --diablo: #7a1f2b; --felt: #2a4030; --card: #f3e9d6; --cardback: #6b1f2a;
   --slot: #33202c; --good: #7fd18a; --bad: #e0617a;
+  /* Dirección B — folk maximalista (acentos; jerarquía de valor: saturado solo en lo no-accionable) */
+  --magenta: #c0398a; --teal: #2a9d8f; --naranja: #e8731f;
   --r: 12px; --shadow: 0 6px 18px rgba(0,0,0,.45);
   font-size: 16px;
 }
@@ -13,6 +15,10 @@ html, body { margin: 0; height: 100%; background: radial-gradient(120% 80% at 50
   font-family: 'Georgia', 'Times New Roman', serif; overflow: hidden; }
 #app { max-width: 520px; margin: 0 auto; height: 100dvh; display: flex; flex-direction: column;
   position: relative; padding: env(safe-area-inset-top) 10px 10px; }
+/* papel picado folk en el borde superior (dirección B) */
+#app::before { content: ''; display: block; height: 30px; margin: 0 -10px 2px;
+  background: url('assets/papel.png') repeat-x center top / auto 30px; flex: 0 0 auto;
+  filter: drop-shadow(0 2px 3px #0007); }
 #fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 button { font-family: inherit; cursor: pointer; border: none; }
 
@@ -47,17 +53,24 @@ button { font-family: inherit; cursor: pointer; border: none; }
   padding: 5px 6px; font-size: .72rem; text-align: center; position: relative; min-height: 46px;
   display: flex; flex-direction: column; justify-content: center; }
 .slot .ico { font-size: 1.1rem; }
-.slot.pacto { border-color: #7a3a52; box-shadow: inset 0 0 0 1px #4a2030; }
-.slot.fulleria { border-color: #3a6a7a; }
+.slot.pacto { border-color: var(--magenta); box-shadow: inset 0 0 0 1px #4a2030, 0 0 8px #c0398a44; }
+.slot.fulleria { border-color: var(--teal); box-shadow: 0 0 8px #2a9d8f33; }
 .slot .nm { color: var(--muted); line-height: 1.05; }
 
 /* ---------- Mesa & felt ---------- */
 .felt { flex: 1; background: radial-gradient(120% 100% at 50% 40%, #335139, var(--felt));
-  border-radius: 16px; margin: 6px 0; border: 2px solid #16261a; box-shadow: inset 0 0 40px #0007;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 10px;
-  position: relative; }
-.felt-label { position: absolute; top: 6px; left: 12px; font-size: .7rem; color: #ffffff66; letter-spacing: 2px; }
-.mesa { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-content: center; }
+  border-radius: 16px; margin: 6px 0; border: 2px solid #16261a;
+  box-shadow: inset 0 0 40px #0009, inset 0 0 0 4px #1a120e, inset 0 0 0 6px var(--oro);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 10px 10px 8%; position: relative; overflow: hidden; }
+/* El Diablo asoma TRAS el tapete (dirección B, como el mockup) */
+.felt::before { content: ''; position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 70%; height: 56%; background: url('assets/diablo.png') no-repeat center top / contain;
+  opacity: .96; filter: drop-shadow(0 8px 18px #000a); z-index: 0; pointer-events: none; }
+.felt-label { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: .68rem;
+  color: var(--oro); letter-spacing: 3px; opacity: .85; z-index: 1; }
+.mesa { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-content: center;
+  position: relative; z-index: 1; }
 
 /* ---------- Cartas ---------- */
 .carta { width: 60px; height: 86px; border-radius: 8px; background: var(--card); color: #2a1a1a;

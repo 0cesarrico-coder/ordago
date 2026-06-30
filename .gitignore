@@ -6,3 +6,5 @@ dist/
 __pycache__/
 .venv/
 ordago-*.jpeg
+design/concepts/*.png
+design/concepts/assets/*.png
