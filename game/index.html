@@ -24,6 +24,11 @@
 
   <!-- GA4: pega tu ID en game/src/telemetry.js (CONFIG.ga4Id='G-XXXXXXXXXX'); se carga solo. -->
 
+  <!-- Tipografías display (folk-cantina): Rye (títulos/etiquetas) + Cinzel (números/naipe, grabado) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Rye&display=swap" rel="stylesheet" />
+
   <!-- PWA: instalable + offline + carga repetida instantánea -->
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
@@ -35,6 +40,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="teatro-bg" aria-hidden="true"></div>
   <div id="app">
     <!-- pantallas se inyectan aquí -->
   </div>

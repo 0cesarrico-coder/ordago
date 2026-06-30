@@ -159,16 +159,29 @@ function manaSlots(build) {
   }).join('')}</div>`;
 }
 
+const SUIT_FILE = { O: 'oros', C: 'copas', E: 'espadas', B: 'bastos' };
+const FIG_FILE = { 8: 'sota', 9: 'caballo', 10: 'rey' };
+
+// Naipe ilustrado (sistema de cartas §7.2): papel + marco grabado + número de valor GRANDE +
+// emblema de palo + (para 8/9/10) ilustración de figura. Mata = marco legendario dorado.
 function cardHTML(c, zona, i, selected, hint, oroBloq) {
-  const fig = NOMBRE_VALOR[c.v];               // 'Sota'|'Caballo'|'Rey' o undefined
+  const figName = NOMBRE_VALOR[c.v];           // 'Sota'|'Caballo'|'Rey' o undefined
+  const figFile = FIG_FILE[c.v];
+  const suit = SUIT_FILE[c.palo];
   const cls = ['carta', `p-${c.palo}`, selected ? 'sel' : '', hint ? 'hint' : '',
-    c.mata ? 'mata' : '', oroBloq ? 'oro-bloq' : ''].filter(Boolean).join(' ');
-  return `<div class="${cls}" data-zona="${zona}" data-i="${i}">
-    <span class="esq">${c.v}${PALO_GLYPH[c.palo]}</span>
-    ${fig ? `<span class="fig">${fig}</span>` : ''}
-    <span class="v">${c.v}</span>
-    <span class="palo">${PALO_GLYPH[c.palo]}</span>
-    ${c.mata ? '<span class="mata-pip">★</span>' : ''}</div>`;
+    c.mata ? 'mata' : '', figFile ? 'figura' : '', oroBloq ? 'oro-bloq' : ''].filter(Boolean).join(' ');
+  const art = figFile
+    ? `<span class="card-fig" style="background-image:url('assets/art/fig-${figFile}.png')"></span>`
+    : `<span class="card-pip" style="background-image:url('assets/art/suit-${suit}.png')"></span>`;
+  const idx = (pos) => `<span class="idx idx-${pos}"><b>${c.v}</b>` +
+    `<i class="suit-mini" style="background-image:url('assets/art/suit-${suit}.png')"></i></span>`;
+  return `<div class="${cls}" data-zona="${zona}" data-i="${i}" aria-label="${c.v} de ${suit}">
+    <span class="card-paper"></span>
+    ${art}
+    ${idx('tl')}${idx('br')}
+    ${figName ? `<span class="fig-nm">${figName}</span>` : ''}
+    ${c.mata ? '<span class="mata-pip">★</span>' : ''}
+    <span class="card-frame"></span></div>`;
 }
 
 // Resaltado de asistencia (§13.1): qué cartas de la Mesa completan un 15 con la carta de mano elegida.

@@ -14,18 +14,27 @@
 html, body { margin: 0; height: 100%; background: radial-gradient(120% 80% at 50% 0%, #2a1622, var(--bg)); color: var(--ink);
   font-family: 'Georgia', 'Times New Roman', serif; overflow: hidden; }
 #app { max-width: 520px; margin: 0 auto; height: 100dvh; display: flex; flex-direction: column;
-  position: relative; padding: env(safe-area-inset-top) 10px 10px; }
-/* papel picado folk en el borde superior (dirección B) */
-#app::before { content: ''; display: block; height: 30px; margin: 0 -10px 2px;
-  background: url('assets/papel.png') repeat-x center top / auto 30px; flex: 0 0 auto;
-  filter: drop-shadow(0 2px 3px #0007); }
+  position: relative; padding: calc(env(safe-area-inset-top) + 22px) 22px 14px; }
+/* Escena TEATRO (dirección B + calidez A): proscenio — cortinas laterales, papel picado arriba,
+   madera abajo. Centro transparente = el tablero. Decorativo (no porta estado, §3.4). */
+.teatro-bg { position: fixed; inset: 0; max-width: 520px; left: 50%; transform: translateX(-50%);
+  background: center top / 100% 100% no-repeat url('assets/art/teatro-frame.png');
+  z-index: 2; pointer-events: none; }
 #fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+/* el contenido del juego va sobre el fieltro, bajo el marco teatro */
+#app > .hud, #app > .mana, #app > .felt, #app > .mano-zona, #app > .acciones,
+#app > .suma, #app > .trampa, #app > .comojugar { position: relative; z-index: 3; }
 button { font-family: inherit; cursor: pointer; border: none; }
 
 /* ---------- HUD ---------- */
 .hud { display: flex; flex-direction: column; gap: 6px; padding: 8px 4px 4px; }
 .hud-top { display: flex; justify-content: space-between; align-items: baseline; }
-.apuesta-nom { font-size: 1.05rem; color: var(--oro); font-weight: bold; letter-spacing: .3px; }
+/* placas doradas (HUD) — folk grabado */
+.hud-top > span, .apuesta-nom { background: linear-gradient(180deg, #3a2412, #23150a);
+  border: 1px solid var(--oro); border-radius: 9px; padding: 4px 10px; box-shadow: 0 2px 6px #0008, inset 0 1px 0 #e8b13a44; }
+.apuesta-nom { font-family: 'Rye', Georgia, serif; font-size: .98rem; color: var(--oro); letter-spacing: .3px;
+  text-shadow: 0 1px 2px #000; }
+.hud-top > span { display: inline-flex; align-items: center; gap: 6px; }
 .reales { color: var(--oro); font-size: .9rem; }
 .reales b { font-size: 1.05rem; }
 .barra-wrap { height: 22px; background: #0008; border-radius: 11px; overflow: hidden; position: relative; border: 1px solid #0006; }
@@ -63,40 +72,60 @@ button { font-family: inherit; cursor: pointer; border: none; }
   box-shadow: inset 0 0 40px #0009, inset 0 0 0 4px #1a120e, inset 0 0 0 6px var(--oro);
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px;
   padding: 10px 10px 8%; position: relative; overflow: hidden; }
-/* El Diablo asoma TRAS el tapete (dirección B, como el mockup) */
-.felt::before { content: ''; position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
-  width: 70%; height: 56%; background: url('assets/diablo.png') no-repeat center top / contain;
-  opacity: .96; filter: drop-shadow(0 8px 18px #000a); z-index: 0; pointer-events: none; }
+/* El Diablo-tahúr reparte al fondo del escenario, TRAS el tapete (money-shot §10.2) */
+.felt::before { content: ''; position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+  width: 62%; height: 54%; background: url('assets/art/diablo-stage.png') no-repeat center top / contain;
+  opacity: .98; filter: drop-shadow(0 8px 20px #000b); z-index: 0; pointer-events: none; }
 .felt-label { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: .68rem;
   color: var(--oro); letter-spacing: 3px; opacity: .85; z-index: 1; }
 .mesa { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-content: center;
   position: relative; z-index: 1; }
 
-/* ---------- Cartas ---------- */
-.carta { width: 60px; height: 86px; border-radius: 8px; background: var(--card); color: #2a1a1a;
-  position: relative; box-shadow: var(--shadow); border: 1px solid #c9b48f; user-select: none;
-  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 3px;
-  transition: transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .14s, outline-color .12s; cursor: pointer; }
-.carta:active { transform: translateY(1px) scale(.98); }
-.carta .v { font-size: 1.5rem; font-weight: bold; line-height: 1; }
-.carta .palo { font-size: 1.1rem; }
-.carta .esq { position: absolute; top: 2px; left: 4px; font-size: .7rem; font-weight: bold; }
-.carta .fig { position: absolute; top: 13px; left: 0; right: 0; text-align: center; font-size: .58rem;
-  color: #8a6a3a; letter-spacing: .3px; text-transform: uppercase; }
-.carta .mata-pip { position: absolute; bottom: 2px; right: 3px; font-size: .65rem; color: var(--oro); }
-.carta.mata { background: linear-gradient(160deg, #fff6e0, #f0d99a); border-color: var(--oro);
-  box-shadow: 0 0 12px #e8b13a66, var(--shadow); }
-.carta.sel { outline: 3px solid var(--oro); transform: translateY(-8px) scale(1.04); z-index: 3; }
-.carta.hint { outline: 2px dashed #ffe08a; }
+/* ---------- Cartas — naipe ilustrado (sistema §7.2) ---------- */
+.carta { width: 62px; height: 90px; border-radius: 9px; position: relative; user-select: none;
+  box-shadow: 0 4px 10px #0007, 0 1px 0 #fff3 inset; cursor: pointer; overflow: hidden;
+  transition: transform .16s cubic-bezier(.2,.85,.25,1), box-shadow .16s, filter .12s;
+  will-change: transform; }
+.carta > * { position: absolute; pointer-events: none; }
+.carta:active { transform: translateY(1px) scale(.985); }
+/* papel envejecido (capa base) */
+.card-paper { inset: 0; border-radius: 9px;
+  background: radial-gradient(120% 90% at 50% 0%, #fbf3df, #efe2c4 60%, #e3d2ad);
+  box-shadow: inset 0 0 14px #c9a86b55; }
+/* arte: emblema de palo (pip) o figura */
+.card-pip { inset: 24% 14% 16%; background: center/contain no-repeat; filter: drop-shadow(0 1px 1px #0003); }
+.card-fig { inset: 16% 6% 8%; background: center bottom/contain no-repeat; }
+/* índices de esquina (número + mini-emblema) — convención de naipe, SOBRE el marco (z6),
+   con keyline para legibilidad garantizada en cualquier fondo (glance-gate §3.4). */
+.idx { display: flex; flex-direction: column; align-items: center; line-height: .8; z-index: 6;
+  background: radial-gradient(closest-side, #fdf6e3ee, #fdf6e3aa 70%, #fdf6e300);
+  padding: 1px 3px 2px; border-radius: 8px; }
+.idx-tl { top: 3px; left: 3px; }
+.idx-br { bottom: 3px; right: 3px; transform: rotate(180deg); }
+.idx b { font-family: 'Cinzel', Georgia, serif; font-weight: 900; font-size: 1.15rem;
+  -webkit-text-stroke: .6px #2a1709; text-shadow: 0 1px 1px #0004; }
+.idx .suit-mini { width: 13px; height: 13px; background: center/contain no-repeat; margin-top: 1px; }
+.fig-nm { bottom: 13px; left: 0; right: 0; text-align: center; font-size: .44rem; letter-spacing: .3px;
+  text-transform: uppercase; color: #4a2e12; z-index: 6; font-weight: bold; text-shadow: 0 0 2px #fdf6e3, 0 0 2px #fdf6e3; }
+/* marco grabado encima */
+.card-frame { inset: 0; background: center/100% 100% no-repeat url('assets/art/card-border.png'); z-index: 5; }
+.carta.mata .card-frame { background-image: url('assets/art/card-mata.png'); }
+.carta.mata { box-shadow: 0 0 14px #e8b13a88, 0 4px 12px #0008; }
+.carta.mata .card-paper { background: radial-gradient(120% 90% at 50% 0%, #fff6df, #f3e1ad 60%, #e7cf8c); }
+.mata-pip { top: 3px; right: 4px; font-size: .7rem; color: var(--oro); z-index: 6; text-shadow: 0 1px 2px #000; }
+/* estados */
+.carta.sel { transform: translateY(-9px) scale(1.05); z-index: 6;
+  box-shadow: 0 0 0 3px var(--oro), 0 10px 20px #000a; }
+.carta.hint { box-shadow: 0 0 0 2px #ffe08a, 0 0 12px #ffd24a88, 0 4px 10px #0007; }
 .carta.dim { filter: grayscale(.6) brightness(.7); }
-.carta.oro-bloq { filter: grayscale(.9) brightness(.55); }
+.carta.oro-bloq { filter: grayscale(.9) brightness(.5); }
 .carta.oro-bloq::after { content: '✕'; position: absolute; inset: 0; display: flex; align-items: center;
-  justify-content: center; font-size: 1.8rem; color: #d4495ecc; }
-/* palo colorings (canal redundante: glifo + color, §10) */
-.carta.p-O .v, .carta.p-O .esq { color: #b5841f; }
-.carta.p-C .v, .carta.p-C .esq { color: #b03a4e; }
-.carta.p-E .v, .carta.p-E .esq { color: #3f6699; }
-.carta.p-B .v, .carta.p-B .esq { color: #3f7a3f; }
+  justify-content: center; font-size: 1.8rem; color: #d4495edd; z-index: 7; pointer-events: none; }
+/* color por palo en el número (canal redundante §10) */
+.carta.p-O .v, .carta.p-O .idx b { color: #a9781a; }
+.carta.p-C .v, .carta.p-C .idx b { color: #aa3247; }
+.carta.p-E .v, .carta.p-E .idx b { color: #355d8f; }
+.carta.p-B .v, .carta.p-B .idx b { color: #386b38; }
 
 /* ---------- Mano ---------- */
 .mano-zona { padding: 4px 0 2px; }
@@ -114,17 +143,23 @@ button { font-family: inherit; cursor: pointer; border: none; }
 /* ---------- Acciones ---------- */
 .acciones { display: flex; gap: 10px; padding: 6px 0 4px; }
 .acciones .btn { flex: 1; }
-.btn { padding: 13px 18px; border-radius: 12px; font-size: 1rem; font-weight: bold; color: var(--ink);
-  background: #3a2430; border: 1px solid #50384a; box-shadow: var(--shadow); transition: transform .1s, filter .1s; }
-.btn:active { transform: translateY(2px); }
-.btn.primary { background: linear-gradient(180deg, #e8b13a, #b5841f); color: #2a1608; }
+.btn { font-family: 'Rye', Georgia, serif; padding: 13px 18px; border-radius: 12px; font-size: 1.02rem;
+  letter-spacing: .4px; color: var(--ink); background: linear-gradient(180deg, #46202e, #2c1420);
+  border: 1px solid #6a3a4a; box-shadow: 0 4px 12px #0008, inset 0 1px 0 #ffffff22;
+  text-shadow: 0 1px 2px #000; transition: transform .1s, filter .1s; }
+.btn:active { transform: translateY(2px); filter: brightness(1.08); }
+.btn.primary { background: linear-gradient(180deg, #f3c44e, #b5841f); color: #2a1608; border-color: #ffe08a;
+  text-shadow: 0 1px 0 #ffe9b0; box-shadow: 0 4px 14px #e8b13a55, 0 4px 12px #0008, inset 0 1px 0 #fff6; }
 .btn.primary:disabled { background: #4a3a30; color: #8a7a6a; filter: none; box-shadow: none; }
 .btn.ghost { background: transparent; }
 
 /* ---------- Pantallas centradas (intro/cantina/fin) ---------- */
 .screen { position: absolute; inset: 0; background: rgba(16,8,12,.96); display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; z-index: 40; }
-.screen h1 { font-size: 2rem; color: var(--oro); margin: 0; text-shadow: 0 2px 8px #000; }
+.screen h1 { font-family: 'Rye', Georgia, serif; font-size: 2.4rem; color: var(--oro); margin: 0;
+  letter-spacing: 1px; text-shadow: 0 2px 0 #7a1f2b, 0 4px 10px #000; }
+.screen h2 { font-family: 'Rye', Georgia, serif; }
+.intro .btn.primary.big { font-size: 1.3rem; }
 .screen h2 { font-size: 1.3rem; color: var(--ink); margin: 0; }
 .screen p { color: var(--muted); max-width: 380px; line-height: 1.5; margin: 0; }
 .screen .big { font-size: 3rem; }
