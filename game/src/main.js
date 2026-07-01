@@ -474,13 +474,24 @@ function restart(opts = {}) {
 fx.initCanvas();
 initAnalytics();
 installErrorCapture();
-// PWA: registra el service worker (carga repetida instantánea + offline). Silencioso si falla.
-// `?nosw` en la URL lo desactiva (afordancia de QA para no servir shell cacheado durante desarrollo).
+// PWA: registra el service worker (carga repetida instantánea + offline) CON auto-actualización.
+// `?nosw` lo desactiva (QA). Clave: updateViaCache:'none' → el navegador nunca cachea sw.js, así
+// detecta releases al instante; y al activarse un SW nuevo (controllerchange) recargamos UNA vez
+// para servir el shell fresco (evita quedarse pegado en una versión vieja — bug real reportado).
 if ('serviceWorker' in navigator && !/[?&]nosw\b/.test(location.search)) {
+  let refreshing = false;
+  // Solo auto-recarga si YA había un SW controlando (= es una ACTUALIZACIÓN, no la 1ª instalación).
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return; refreshing = true; location.reload();
+    });
+  }
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(
-      () => track('pwa_sw_ready', {}),
-      () => { /* file:// o sin soporte: el juego funciona igual */ });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      track('pwa_sw_ready', {});
+      reg.update();                                  // fuerza chequeo de versión nueva en cada carga
+      setInterval(() => reg.update(), 60 * 60 * 1000); // y cada hora si la pestaña sigue viva
+    }, () => { /* file:// o sin soporte: el juego funciona igual */ });
   });
 }
 track('session_start', { mode: new URLSearchParams(location.search).get('d') ? 'shared' : 'random',
