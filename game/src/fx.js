@@ -42,9 +42,21 @@ export function escobaBurst(score, limpia) {
   const r = mesa ? mesa.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
   const x = r.left + r.width / 2, y = r.top + r.height / 2;
   const cols = limpia ? ['#7fd18a', '#e8b13a', '#fff'] : ['#e8b13a', '#d4495e', '#f3e9d6'];
-  emit(x, y, limpia ? 46 : 26, cols, { speed: limpia ? 6 : 4, up: 2 });
+  emit(x, y, limpia ? 56 : 30, cols, { speed: limpia ? 7 : 4.5, up: 2 });
+  flash(x, y, limpia ? '#7fd18a' : '#e8b13a', limpia ? 1 : 0.7);
   const app = document.getElementById('app');
   if (app) { app.classList.remove('shake'); void app.offsetWidth; app.classList.add('shake'); }
+}
+
+// destello radial (game-feel): pulso de luz breve en la Mesa al hacer Escoba
+export function flash(x, y, color = '#e8b13a', strength = 1) {
+  const el = document.createElement('div');
+  el.className = 'fx-flash';
+  Object.assign(el.style, { left: x + 'px', top: y + 'px',
+    background: `radial-gradient(circle, ${color} 0%, transparent 68%)`, opacity: String(0.55 * strength) });
+  document.body.appendChild(el);
+  requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-50%) scale(2.4)'; el.style.opacity = '0'; });
+  setTimeout(() => el.remove(), 480);
 }
 
 export function confetti() {

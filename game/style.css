@@ -37,12 +37,18 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .hud-top > span { display: inline-flex; align-items: center; gap: 6px; }
 .reales { color: var(--oro); font-size: .9rem; }
 .reales b { font-size: 1.05rem; }
-.barra-wrap { height: 22px; background: #0008; border-radius: 11px; overflow: hidden; position: relative; border: 1px solid #0006; }
-.barra { height: 100%; width: 0%; background: linear-gradient(90deg, var(--diablo), var(--oro));
-  transition: width .45s cubic-bezier(.2,.8,.2,1); border-radius: 11px; }
+.barra-wrap { height: 24px; background: linear-gradient(180deg, #0c0608, #160a10); border-radius: 12px;
+  overflow: hidden; position: relative; border: 1px solid #000; box-shadow: inset 0 2px 5px #000c, 0 1px 0 #ffffff12; }
+.barra { height: 100%; width: 0%; border-radius: 12px;
+  background: linear-gradient(180deg, #f3c44e, #e8901f 55%, #b5481f);
+  box-shadow: inset 0 1px 0 #fff7, inset 0 -3px 6px #0006, 0 0 10px #e8b13a66;
+  transition: width .45s cubic-bezier(.2,.8,.2,1); }
 .barra-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: .8rem; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
-.hud-bottom { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); }
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: .82rem; color: #fff;
+  text-shadow: 0 1px 2px #000, 0 0 3px #000; font-variant-numeric: tabular-nums; letter-spacing: .5px; }
+.hud-bottom { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted);
+  padding: 0 4px; }
+.hud-bottom b { color: var(--ink); }
 .mutebtn { background: transparent; font-size: 1rem; padding: 0 6px; opacity: .8; }
 .comojugar { margin: 2px 0 0; padding: 7px 10px; border-radius: 8px; background: #2a1a24cc;
   border: 1px dashed #6a4a5a; color: var(--muted); font-size: .8rem; text-align: center; line-height: 1.35; }
@@ -56,15 +62,20 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .trampa .t-nom { color: var(--oro); font-weight: bold; }
 .trampa.rota { background: linear-gradient(90deg, #16331f, #1f5a2e); border-color: #2f7a40; color: #d7ffd9; }
 
-/* ---------- Maña slots ---------- */
-.mana { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
-.slot { flex: 1; max-width: 120px; background: var(--slot); border: 1px solid #50384a; border-radius: 10px;
-  padding: 5px 6px; font-size: .72rem; text-align: center; position: relative; min-height: 46px;
-  display: flex; flex-direction: column; justify-content: center; }
-.slot .ico { font-size: 1.1rem; }
-.slot.pacto { border-color: var(--magenta); box-shadow: inset 0 0 0 1px #4a2030, 0 0 8px #c0398a44; }
-.slot.fulleria { border-color: var(--teal); box-shadow: 0 0 8px #2a9d8f33; }
-.slot .nm { color: var(--muted); line-height: 1.05; }
+/* ---------- Maña slots (amuletos folk) ---------- */
+.mana { display: flex; gap: 7px; justify-content: center; margin: 5px 0; }
+.slot { flex: 1; max-width: 124px; border-radius: 12px 12px 10px 10px; padding: 5px 6px 4px;
+  font-size: .68rem; text-align: center; position: relative; min-height: 52px;
+  background: linear-gradient(180deg, #2e1a26, #1c1018); border: 1.5px solid #6a4a3a;
+  box-shadow: 0 3px 8px #0008, inset 0 1px 0 #ffffff14;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.slot .ico { width: 30px; height: 30px; background: center/contain no-repeat;
+  display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 1px 2px #0007); }
+.ico-emoji { font-size: 1.4rem; line-height: 1; }
+.slot.pacto { border-color: var(--magenta); box-shadow: 0 0 10px #c0398a55, 0 3px 8px #0008, inset 0 1px 0 #ffffff14; }
+.slot.fulleria { border-color: var(--teal); box-shadow: 0 0 10px #2a9d8f55, 0 3px 8px #0008, inset 0 1px 0 #ffffff14; }
+.slot .nm { color: #d8c4b0; line-height: 1.02; font-weight: bold; }
+.slot.pacto .nm { color: #f0b8d8; } .slot.fulleria .nm { color: #a8e6dc; }
 
 /* ---------- Mesa & felt ---------- */
 .felt { flex: 1; background: radial-gradient(120% 100% at 50% 40%, #335139, var(--felt));
@@ -154,8 +165,10 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .btn.ghost { background: transparent; }
 
 /* ---------- Pantallas centradas (intro/cantina/fin) ---------- */
-.screen { position: absolute; inset: 0; background: rgba(16,8,12,.96); display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; z-index: 40; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; z-index: 40;
+  background: radial-gradient(120% 80% at 50% 12%, rgba(58,22,40,.82), rgba(14,7,11,.96) 70%);
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); overflow-y: auto; }
 .screen h1 { font-family: 'Rye', Georgia, serif; font-size: 2.4rem; color: var(--oro); margin: 0;
   letter-spacing: 1px; text-shadow: 0 2px 0 #7a1f2b, 0 4px 10px #000; }
 .screen h2 { font-family: 'Rye', Georgia, serif; }
@@ -181,7 +194,9 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .oferta { width: 130px; background: var(--slot); border: 1px solid #50384a; border-radius: 12px; padding: 12px 8px;
   display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .oferta.counter { border-color: var(--oro); box-shadow: 0 0 12px #e8b13a55; }
-.oferta .ico { font-size: 2rem; } .oferta .nm { color: var(--oro); font-weight: bold; font-size: .9rem; }
+.oferta .ico { width: 52px; height: 52px; background: center/contain no-repeat; filter: drop-shadow(0 2px 4px #0008); }
+.oferta .ico.ico-emoji { font-size: 2rem; display: flex; align-items: center; justify-content: center; }
+.oferta .nm { color: var(--oro); font-weight: bold; font-size: .9rem; font-family: 'Rye', Georgia, serif; }
 .oferta .ds { font-size: .72rem; color: var(--muted); line-height: 1.2; }
 .oferta .costo { font-size: .8rem; color: var(--oro); }
 .oferta button { margin-top: 4px; padding: 7px 10px; border-radius: 8px; background: #e8b13a; color: #2a1608; font-weight: bold; }
@@ -196,6 +211,17 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .sticker .stamp { position: absolute; top: 10px; right: 12px; font-size: .7rem; color: var(--oro);
   border: 1px solid var(--oro); border-radius: 6px; padding: 2px 6px; transform: rotate(8deg); }
 
+/* destello radial de Escoba (game-feel) */
+.fx-flash { position: fixed; z-index: 55; width: 220px; height: 220px; border-radius: 50%;
+  transform: translate(-50%,-50%) scale(.4); pointer-events: none; mix-blend-mode: screen;
+  transition: transform .45s cubic-bezier(.2,.7,.3,1), opacity .45s ease-out; }
+/* reparto de cartas (stagger) — solo al iniciar apuesta */
+.deal .carta { animation: dealIn .42s cubic-bezier(.2,.85,.25,1) backwards; }
+.deal .carta:nth-child(1) { animation-delay: .04s; } .deal .carta:nth-child(2) { animation-delay: .12s; }
+.deal .carta:nth-child(3) { animation-delay: .20s; } .deal .carta:nth-child(4) { animation-delay: .28s; }
+.deal .carta:nth-child(5) { animation-delay: .36s; } .deal .carta:nth-child(6) { animation-delay: .44s; }
+@keyframes dealIn { from { opacity: 0; transform: translateY(-46px) rotate(-7deg) scale(.82); }
+  to { opacity: 1; transform: none; } }
 .float-score { position: fixed; z-index: 60; font-weight: bold; pointer-events: none;
   text-shadow: 0 2px 6px #000; animation: floatUp 1s ease-out forwards; }
 @keyframes floatUp { 0% { opacity: 0; transform: translateY(0) scale(.6); } 15% { opacity: 1; }

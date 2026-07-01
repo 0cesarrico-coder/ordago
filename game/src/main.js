@@ -83,6 +83,9 @@ function renderPlay() {
   const t = s.tctx;
   const target = (s.enEnvite && t.activa) ? t.target : 15;
   const pct = Math.min(100, (s.scoreApuesta / s.umbral) * 100);
+  // ¿primera mano de la apuesta? → animación de reparto + sonido (game-feel)
+  const fresh = (s.manosLeft === s.apuesta.manos && s.scoreApuesta === 0);
+  if (fresh) { for (let k = 0; k < 4; k++) setTimeout(() => audio.sfx.deal(), 90 + k * 80); }
   app.innerHTML = `
     <div class="hud">
       <div class="hud-top">
@@ -104,13 +107,13 @@ function renderPlay() {
       ? '<div class="comojugar">Toca una carta de tu <b>mano</b>, luego cartas de la <b>Mesa</b> que sumen <b>15</b> con ella → <b>ESCOBA</b>.</div>' : ''}
     <div class="felt">
       <span class="felt-label">LA MESA DEL DIABLO</span>
-      <div class="mesa" id="mesa">${s.mesa.map((c, i) =>
+      <div class="mesa${fresh ? ' deal' : ''}" id="mesa">${s.mesa.map((c, i) =>
         cardHTML(c, 'mesa', i, sel.mesa.has(i), false, oroBloqueado(c, t))).join('')}</div>
     </div>
     <div class="suma" id="suma"></div>
     <div class="mano-zona">
       <div class="mano-label">TU MANO</div>
-      <div class="mano" id="mano">${s.hand.map((c, i) =>
+      <div class="mano${fresh ? ' deal' : ''}" id="mano">${s.hand.map((c, i) =>
         cardHTML(c, 'hand', i, sel.handIdx === i, false, false)).join('')}</div>
     </div>
     <div class="acciones">
@@ -149,13 +152,19 @@ function trampaBanner(t) {
     <span class="t-nom">${t.nombre}</span> — ${t.desc}${t.roto ? ' <b>(¡neutralizada!)</b>' : ''}</div>`;
 }
 
+function manaIcon(id, d) {
+  // ícono folk generado si existe (Pacto/Fullería conocidos); si no, emoji de respaldo
+  const known = PACTOS[id] || FULLERIAS[id];
+  return known
+    ? `<span class="ico" style="background-image:url('assets/art/mana/${id}.png')"></span>`
+    : `<span class="ico ico-emoji">${(d && d.icon) || '·'}</span>`;
+}
 function manaSlots(build) {
   return `<div class="mana">${build.map((id) => {
     const p = PACTOS[id], f = FULLERIAS[id];
     const tipo = p ? 'pacto' : 'fulleria';
-    const d = p || f || { nombre: id, icon: '·' };
-    return `<div class="slot ${tipo}"><span class="ico">${d.icon || (p ? '🜄' : '👁')}</span>
-      <span class="nm">${d.nombre}</span></div>`;
+    const d = p || f || { nombre: id };
+    return `<div class="slot ${tipo}">${manaIcon(id, d)}<span class="nm">${d.nombre}</span></div>`;
   }).join('')}</div>`;
 }
 
@@ -281,6 +290,7 @@ function onEscoba() {
 }
 function onPasar() {
   if (sel.handIdx === null) { fx.toast('Elige qué carta dejas en la Mesa'); return; }
+  audio.sfx.place();
   track('pass', { bet: game.apuesta?.id, index: game.apuestaIndex });
   const res = game.pasar(sel.handIdx);
   sel = { handIdx: null, mesa: new Set() };
@@ -321,13 +331,13 @@ function renderCantina() {
       ${proximaTrampa ? `<p class="small">⚠️ El Envite traerá la Trampa <b style="color:#e8b13a">${proximaTrampa.nombre}</b> — ${proximaTrampa.desc}. Equipa su Fullería para romperla.</p>` : ''}
       <p>Equipa una Maña (reemplaza una ranura). Tus ranuras:</p>
       <div class="mana">${s.build.map((id, i) => {
-        const d = PACTOS[id] || FULLERIAS[id] || { nombre: id, icon: '·' };
+        const d = PACTOS[id] || FULLERIAS[id] || { nombre: id };
         return `<div class="slot ${PACTOS[id] ? 'pacto' : 'fulleria'}" data-slot="${i}">
-          <span class="ico">${d.icon}</span><span class="nm">${d.nombre}</span></div>`;
+          ${manaIcon(id, d)}<span class="nm">${d.nombre}</span></div>`;
       }).join('')}</div>
       <div class="ofertas">${ofertas.map((o, k) => `
         <div class="oferta ${o.rompeEnvite ? 'counter' : ''}" data-k="${k}">
-          <span class="ico">${o.data.icon}</span>
+          ${manaIcon(o.id, o.data)}
           <span class="nm">${o.data.nombre}</span>
           <span class="ds">${o.data.desc}</span>
           ${o.rompeEnvite ? '<span class="small" style="color:#e8b13a">rompe el Envite</span>' : ''}
