@@ -14,12 +14,12 @@
 html, body { margin: 0; height: 100%; background: radial-gradient(120% 80% at 50% 0%, #2a1622, var(--bg)); color: var(--ink);
   font-family: 'Georgia', 'Times New Roman', serif; overflow: hidden; }
 #app { max-width: 520px; margin: 0 auto; height: 100dvh; display: flex; flex-direction: column;
-  position: relative; padding: calc(env(safe-area-inset-top) + 22px) 22px 14px; }
+  position: relative; padding: calc(env(safe-area-inset-top) + 14px) 12px 12px; }
 /* Escena TEATRO (dirección B + calidez A): proscenio — cortinas laterales, papel picado arriba,
    madera abajo. Centro transparente = el tablero. Decorativo (no porta estado, §3.4). */
 .teatro-bg { position: fixed; inset: 0; max-width: 520px; left: 50%; transform: translateX(-50%);
   background: center top / 100% 100% no-repeat url('assets/art/teatro-frame.png');
-  z-index: 2; pointer-events: none; }
+  z-index: 2; pointer-events: none; opacity: .5; }
 #fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 /* el contenido del juego va sobre el fieltro, bajo el marco teatro */
 #app > .hud, #app > .mana, #app > .felt, #app > .mano-zona, #app > .acciones,
@@ -32,7 +32,7 @@ button { font-family: inherit; cursor: pointer; border: none; }
 /* placas doradas (HUD) — folk grabado */
 .hud-top > span, .apuesta-nom { background: linear-gradient(180deg, #3a2412, #23150a);
   border: 1px solid var(--oro); border-radius: 9px; padding: 4px 10px; box-shadow: 0 2px 6px #0008, inset 0 1px 0 #e8b13a44; }
-.apuesta-nom { font-family: 'Rye', Georgia, serif; font-size: .98rem; color: var(--oro); letter-spacing: .3px;
+.apuesta-nom { font-family: 'Cinzel', Georgia, serif; font-size: .98rem; color: var(--oro); letter-spacing: .3px;
   text-shadow: 0 1px 2px #000; }
 .hud-top > span { display: inline-flex; align-items: center; gap: 6px; }
 .reales { color: var(--oro); font-size: .9rem; }
@@ -77,78 +77,84 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .slot .nm { color: #d8c4b0; line-height: 1.02; font-weight: bold; }
 .slot.pacto .nm { color: #f0b8d8; } .slot.fulleria .nm { color: #a8e6dc; }
 
-/* ---------- Mesa & felt ---------- */
-.felt { flex: 1; background: radial-gradient(120% 100% at 50% 40%, #335139, var(--felt));
-  border-radius: 16px; margin: 6px 0; border: 2px solid #16261a;
-  box-shadow: inset 0 0 40px #0009, inset 0 0 0 4px #1a120e, inset 0 0 0 6px var(--oro);
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px;
-  padding: 10px 10px 8%; position: relative; overflow: hidden; }
-/* El Diablo-tahúr reparte al fondo del escenario, TRAS el tapete (money-shot §10.2) */
-.felt::before { content: ''; position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
-  width: 62%; height: 54%; background: url('assets/art/diablo-stage.png') no-repeat center top / contain;
-  opacity: .98; filter: drop-shadow(0 8px 20px #000b); z-index: 0; pointer-events: none; }
-.felt-label { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: .68rem;
-  color: var(--oro); letter-spacing: 3px; opacity: .85; z-index: 1; }
-.mesa { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-content: center;
+/* ---------- Mesa & felt (fieltro con profundidad + riel de madera) ---------- */
+.felt { flex: 1; margin: 7px 1px; border-radius: 13px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 9px;
+  padding: 10px 8px 7%;
+  background:
+    radial-gradient(115% 62% at 50% 4%, #1e2f1c 0%, #16241590 42%, transparent 72%),
+    repeating-linear-gradient(48deg, #ffffff06 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(-48deg, #00000010 0 1px, transparent 1px 5px),
+    radial-gradient(135% 105% at 50% 78%, #4a6d4d, #315036 60%, #24391f);
+  box-shadow: inset 0 0 72px #000b, inset 0 5px 16px #0008,
+    0 0 0 5px #3c2617, 0 0 0 7px #1f120a, 0 9px 24px #000a; }
+/* El Diablo-tahúr reparte al fondo del escenario, sobre la pared trasera oscura (aterrizado, no flota) */
+.felt::before { content: ''; position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 58%; height: 50%; background: url('assets/art/diablo-stage.png') no-repeat center top / contain;
+  opacity: .97; filter: drop-shadow(0 10px 16px #000c); z-index: 0; pointer-events: none; }
+/* sombra que lo ancla al fondo */
+.felt::after { content: ''; position: absolute; top: 44%; left: 50%; transform: translateX(-50%);
+  width: 52%; height: 9%; background: radial-gradient(50% 50%, #0009, transparent 70%);
+  z-index: 0; pointer-events: none; filter: blur(3px); }
+.felt-label { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font-size: .62rem;
+  font-family: 'Cinzel', Georgia, serif; color: #e8c88a; letter-spacing: 3px; opacity: .7; z-index: 1; }
+.mesa { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; align-content: center;
   position: relative; z-index: 1; }
 
-/* ---------- Cartas — naipe ilustrado (sistema §7.2) ---------- */
-.carta { width: 62px; height: 90px; border-radius: 9px; position: relative; user-select: none;
-  box-shadow: 0 4px 10px #0007, 0 1px 0 #fff3 inset; cursor: pointer; overflow: hidden;
-  transition: transform .16s cubic-bezier(.2,.85,.25,1), box-shadow .16s, filter .12s;
-  will-change: transform; }
+/* ---------- Cartas — naipe español auténtico (línea fina doble + papel crema) ---------- */
+.carta { width: 66px; height: 99px; border-radius: 7px; position: relative; user-select: none;
+  background: linear-gradient(158deg, #fdf7e8, #f0e4c8);
+  box-shadow: 0 3px 8px #0008, 0 1px 0 #fff8 inset, 0 0 0 1px #b7a179; cursor: pointer; overflow: hidden;
+  transition: transform .16s cubic-bezier(.2,.85,.25,1), box-shadow .16s, filter .12s; will-change: transform; }
 .carta > * { position: absolute; pointer-events: none; }
 .carta:active { transform: translateY(1px) scale(.985); }
-/* papel envejecido (capa base) */
-.card-paper { inset: 0; border-radius: 9px;
-  background: radial-gradient(120% 90% at 50% 0%, #fbf3df, #efe2c4 60%, #e3d2ad);
-  box-shadow: inset 0 0 14px #c9a86b55; }
-/* arte: PINTAS (valor = nº de emblemas, naipe español) o figura ilustrada */
-.card-pips { position: absolute; inset: 6% 9% 8%; z-index: 2; }
+.card-paper { inset: 0; border-radius: 7px;
+  background: radial-gradient(135% 80% at 50% -8%, #fffdf4, #f4ead2 55%, #e8d8b4); }
+/* arte: PINTAS (valor = nº de emblemas) o figura ilustrada */
+.card-pips { position: absolute; inset: 13% 13% 13%; z-index: 2; }
 .card-pips .pip { position: absolute; width: 30%; aspect-ratio: 1; transform: translate(-50%, -50%);
-  background: center/contain no-repeat; filter: drop-shadow(0 1px 1px #0005); }
-.card-pips[data-n="1"] .pip { width: 48%; }
-.card-pips[data-n="2"] .pip, .card-pips[data-n="3"] .pip { width: 34%; }
-.card-pips[data-n="4"] .pip, .card-pips[data-n="5"] .pip { width: 30%; }
-.card-pips[data-n="6"] .pip, .card-pips[data-n="7"] .pip { width: 25%; }
-.card-fig { position: absolute; inset: 14% 6% 9%; background: center bottom/contain no-repeat; z-index: 2; }
-/* índices de esquina (número + mini-emblema) — convención de naipe, SOBRE el marco (z6),
-   con keyline para legibilidad garantizada en cualquier fondo (glance-gate §3.4). */
-.idx { display: flex; flex-direction: column; align-items: center; line-height: .8; z-index: 6;
-  background: radial-gradient(closest-side, #fdf6e3ee, #fdf6e3aa 70%, #fdf6e300);
-  padding: 1px 3px 2px; border-radius: 8px; }
-.idx-tl { top: 3px; left: 3px; }
-.idx-br { bottom: 3px; right: 3px; transform: rotate(180deg); }
-.idx b { font-family: 'Cinzel', Georgia, serif; font-weight: 900; font-size: 1.15rem;
-  -webkit-text-stroke: .6px #2a1709; text-shadow: 0 1px 1px #0004; }
-.idx .suit-mini { width: 13px; height: 13px; background: center/contain no-repeat; margin-top: 1px; }
-.fig-nm { bottom: 13px; left: 0; right: 0; text-align: center; font-size: .44rem; letter-spacing: .3px;
-  text-transform: uppercase; color: #4a2e12; z-index: 6; font-weight: bold; text-shadow: 0 0 2px #fdf6e3, 0 0 2px #fdf6e3; }
-/* marco grabado encima */
-.card-frame { inset: 0; background: center/100% 100% no-repeat url('assets/art/card-border.png'); z-index: 5; }
-.carta.mata .card-frame { background-image: url('assets/art/card-mata.png'); }
-.carta.mata { box-shadow: 0 0 14px #e8b13a88, 0 4px 12px #0008; }
-.carta.mata .card-paper { background: radial-gradient(120% 90% at 50% 0%, #fff6df, #f3e1ad 60%, #e7cf8c); }
-.mata-pip { top: 3px; right: 4px; font-size: .7rem; color: var(--oro); z-index: 6; text-shadow: 0 1px 2px #000; }
+  background: center/contain no-repeat; filter: drop-shadow(0 1px 1px #0004); }
+.card-pips[data-n="1"] .pip { width: 52%; }
+.card-pips[data-n="2"] .pip, .card-pips[data-n="3"] .pip { width: 36%; }
+.card-pips[data-n="4"] .pip, .card-pips[data-n="5"] .pip { width: 31%; }
+.card-pips[data-n="6"] .pip, .card-pips[data-n="7"] .pip { width: 26%; }
+.card-fig { position: absolute; inset: 13% 9% 11%; background: center bottom/contain no-repeat; z-index: 2; }
+/* MARCO AUTÉNTICO: doble línea fina oxblood (baraja española), sin oro recargado */
+.card-frame { position: absolute; inset: 4px; border: 1.4px solid #8f2f28; border-radius: 5px; z-index: 5; }
+.card-frame::after { content: ''; position: absolute; inset: 2px; border: .8px solid #8f2f28aa; border-radius: 3px; }
+.carta.mata .card-frame, .carta.mata .card-frame::after { border-color: #b98a24; }
+.carta.mata { box-shadow: 0 0 10px #e8b13a66, 0 3px 8px #0008, 0 0 0 1px #c9a24e; }
+.carta.mata .card-paper { background: radial-gradient(135% 80% at 50% -8%, #fffbee, #f6ecc9 55%, #ecdca6); }
+/* índices de esquina (número + mini-emblema), estilo naipe — nítidos sobre crema */
+.idx { display: flex; flex-direction: column; align-items: center; line-height: .78; z-index: 6; padding: 1px 2px; }
+.idx-tl { top: 4px; left: 4px; }
+.idx-br { bottom: 4px; right: 4px; transform: rotate(180deg); }
+.idx b { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 1.02rem;
+  text-shadow: 0 1px 0 #fff9; }
+.idx .suit-mini { width: 12px; height: 12px; background: center/contain no-repeat; margin-top: 1px; }
+.fig-nm { bottom: 12px; left: 0; right: 0; text-align: center; font-size: .44rem; letter-spacing: .3px;
+  text-transform: uppercase; color: #6a4322; z-index: 6; font-weight: bold; text-shadow: 0 1px 0 #fff9; }
+.mata-pip { top: 2px; right: 5px; font-size: .62rem; color: #b98a24; z-index: 6; text-shadow: 0 1px 1px #fff8; }
 /* estados */
-.carta.sel { transform: translateY(-9px) scale(1.05); z-index: 6;
-  box-shadow: 0 0 0 3px var(--oro), 0 10px 20px #000a; }
-.carta.hint { box-shadow: 0 0 0 2px #ffe08a, 0 0 12px #ffd24a88, 0 4px 10px #0007; }
+.carta.sel { transform: translateY(-10px) scale(1.06); z-index: 8;
+  box-shadow: 0 0 0 3px var(--oro), 0 12px 22px #000b; }
+.carta.hint { box-shadow: 0 0 0 2px #ffe08a, 0 0 14px #ffd24aaa, 0 3px 8px #0008; }
 .carta.dim { filter: grayscale(.6) brightness(.7); }
 .carta.oro-bloq { filter: grayscale(.9) brightness(.5); }
 .carta.oro-bloq::after { content: '✕'; position: absolute; inset: 0; display: flex; align-items: center;
   justify-content: center; font-size: 1.8rem; color: #d4495edd; z-index: 7; pointer-events: none; }
 /* color por palo en el número (canal redundante §10) */
-.carta.p-O .v, .carta.p-O .idx b { color: #a9781a; }
-.carta.p-C .v, .carta.p-C .idx b { color: #aa3247; }
-.carta.p-E .v, .carta.p-E .idx b { color: #355d8f; }
-.carta.p-B .v, .carta.p-B .idx b { color: #386b38; }
+.carta.p-O .idx b { color: #a9781a; }
+.carta.p-C .idx b { color: #aa3247; }
+.carta.p-E .idx b { color: #355d8f; }
+.carta.p-B .idx b { color: #386b38; }
 
 /* ---------- Mano ---------- */
-.mano-zona { padding: 4px 0 2px; }
-.mano-label { font-size: .7rem; color: var(--muted); letter-spacing: 1px; text-align: center; }
-.mano { display: flex; gap: 10px; justify-content: center; padding: 6px 0; min-height: 96px; align-items: flex-end; }
-.mano .carta { width: 64px; height: 92px; }
+.mano-zona { padding: 3px 0 2px; }
+.mano-label { font-family: 'Cinzel', Georgia, serif; font-size: .64rem; color: var(--muted);
+  letter-spacing: 2px; text-align: center; }
+.mano { display: flex; gap: 12px; justify-content: center; padding: 7px 0 4px; min-height: 118px; align-items: flex-end; }
+.mano .carta { width: 78px; height: 117px; }
 
 /* ---------- Selección / suma ---------- */
 .suma { text-align: center; font-size: 1.1rem; min-height: 28px; color: var(--ink); }
@@ -160,24 +166,29 @@ button { font-family: inherit; cursor: pointer; border: none; }
 /* ---------- Acciones ---------- */
 .acciones { display: flex; gap: 10px; padding: 6px 0 4px; }
 .acciones .btn { flex: 1; }
-.btn { font-family: 'Rye', Georgia, serif; padding: 13px 18px; border-radius: 12px; font-size: 1.02rem;
-  letter-spacing: .4px; color: var(--ink); background: linear-gradient(180deg, #46202e, #2c1420);
-  border: 1px solid #6a3a4a; box-shadow: 0 4px 12px #0008, inset 0 1px 0 #ffffff22;
-  text-shadow: 0 1px 2px #000; transition: transform .1s, filter .1s; }
-.btn:active { transform: translateY(2px); filter: brightness(1.08); }
-.btn.primary { background: linear-gradient(180deg, #f3c44e, #b5841f); color: #2a1608; border-color: #ffe08a;
-  text-shadow: 0 1px 0 #ffe9b0; box-shadow: 0 4px 14px #e8b13a55, 0 4px 12px #0008, inset 0 1px 0 #fff6; }
-.btn.primary:disabled { background: #4a3a30; color: #8a7a6a; filter: none; box-shadow: none; }
-.btn.ghost { background: transparent; }
+.btn { font-family: 'Cinzel', Georgia, serif; font-weight: 700; padding: 14px 20px; border-radius: 11px;
+  font-size: .98rem; letter-spacing: 1.2px; text-transform: uppercase; color: #f0e2c8;
+  background: linear-gradient(180deg, #3f2130, #27131c); border: 1px solid #77454f;
+  box-shadow: 0 3px 10px #0008, inset 0 1px 0 #ffffff1c, inset 0 -2px 7px #0006;
+  text-shadow: 0 1px 2px #000; transition: transform .1s, filter .12s, box-shadow .12s; }
+.btn:active { transform: translateY(2px); filter: brightness(1.07);
+  box-shadow: 0 1px 4px #0008, inset 0 1px 0 #ffffff1c; }
+.btn.primary { color: #2c1808; border-color: #ffe6a0;
+  background: linear-gradient(180deg, #ffe08a 0%, #ecc158 44%, #c68f22 100%);
+  box-shadow: 0 5px 16px #e8b13a4a, 0 3px 10px #0008, inset 0 1px 0 #fff9, inset 0 -3px 9px #0002;
+  text-shadow: 0 1px 0 #ffedb8; }
+.btn.primary:disabled { background: linear-gradient(180deg, #524234, #3a2e24); color: #8a7a6a;
+  border-color: #6a5844; filter: none; box-shadow: inset 0 1px 0 #ffffff10; }
+.btn.ghost { background: linear-gradient(180deg, #2a1a24, #1c1018); border-color: #5a3a4a; }
 
 /* ---------- Pantallas centradas (intro/cantina/fin) ---------- */
 .screen { position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; z-index: 40;
   background: radial-gradient(120% 80% at 50% 12%, rgba(58,22,40,.82), rgba(14,7,11,.96) 70%);
   backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); overflow-y: auto; }
-.screen h1 { font-family: 'Rye', Georgia, serif; font-size: 2.4rem; color: var(--oro); margin: 0;
+.screen h1 { font-family: 'Cinzel', Georgia, serif; font-size: 2.4rem; color: var(--oro); margin: 0;
   letter-spacing: 1px; text-shadow: 0 2px 0 #7a1f2b, 0 4px 10px #000; }
-.screen h2 { font-family: 'Rye', Georgia, serif; }
+.screen h2 { font-family: 'Cinzel', Georgia, serif; }
 .intro .btn.primary.big { font-size: 1.3rem; }
 .screen h2 { font-size: 1.3rem; color: var(--ink); margin: 0; }
 .screen p { color: var(--muted); max-width: 380px; line-height: 1.5; margin: 0; }
@@ -204,7 +215,7 @@ button { font-family: inherit; cursor: pointer; border: none; }
 .oferta.counter { border-color: var(--oro); box-shadow: 0 0 12px #e8b13a55; }
 .oferta .ico { width: 52px; height: 52px; background: center/contain no-repeat; filter: drop-shadow(0 2px 4px #0008); }
 .oferta .ico.ico-emoji { font-size: 2rem; display: flex; align-items: center; justify-content: center; }
-.oferta .nm { color: var(--oro); font-weight: bold; font-size: .9rem; font-family: 'Rye', Georgia, serif; }
+.oferta .nm { color: var(--oro); font-weight: bold; font-size: .9rem; font-family: 'Cinzel', Georgia, serif; }
 .oferta .ds { font-size: .72rem; color: var(--muted); line-height: 1.2; }
 .oferta .costo { font-size: .8rem; color: var(--oro); }
 .oferta button { margin-top: 4px; padding: 7px 10px; border-radius: 8px; background: #e8b13a; color: #2a1608; font-weight: bold; }
