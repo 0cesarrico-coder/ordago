@@ -46,20 +46,15 @@ function screenIntro() {
   track('intro_view', { seedMode, dailyDone });
   app.innerHTML = `
     <div class="screen intro">
-      <div class="diablo-cara">😈</div>
-      <h1>ÓRDAGO</h1>
-      <p class="tagline">Le haces <b>trampa al Diablo</b> con la baraja española.</p>
-      <ol class="comojuego">
-        <li><b>Suma 15</b> con una carta de tu mano + cartas de la Mesa → <b>Escoba</b> 🧹</li>
-        <li>El Diablo pone <b>Trampas</b>; tú las rompes con tus <b>Fullerías</b> 😏</li>
-        <li>Gana las <b>3 apuestas</b> y recupera tu alma.</li>
-      </ol>
-      <button class="btn primary big" id="play">${seedMode === 'shared' ? 'Aceptar el reto 🎴' : 'Repartir cartas 🎴'}</button>
-      <button class="btn ghost" id="reto" ${dailyDone ? 'disabled' : ''}>
-        ${dailyDone ? '✓ Reto del Día completado' : '🗓️ Reto del Día'}</button>
-      ${rachaTxt ? `<p class="racha">${rachaTxt}</p>` : ''}
-      <p class="small sem">${seedMode === 'shared' ? 'Reto recibido' : 'Semilla'} #${seedShown} · v${VERSION}</p>
-      <p class="small priv">Juego anónimo · no pedimos datos personales</p>
+      <div class="intro-hero"></div>
+      <div class="intro-panel">
+        <p class="comojuego-line"><b>Suma 15</b> = Escoba 🧹 · rompe las <b>Trampas</b> del Diablo 😏 · gana las <b>3 apuestas</b></p>
+        <button class="btn primary big" id="play">${seedMode === 'shared' ? '🎴 Aceptar el reto' : '🎴 Repartir cartas'}</button>
+        <button class="btn ghost" id="reto" ${dailyDone ? 'disabled' : ''}>
+          ${dailyDone ? '✓ Reto del Día completado' : '🗓️ Reto del Día'}</button>
+        ${rachaTxt ? `<p class="racha">${rachaTxt}</p>` : ''}
+        <p class="small sem">${seedMode === 'shared' ? 'Reto recibido' : 'Semilla'} #${seedShown} · v${VERSION} · anónimo</p>
+      </div>
     </div>`;
   document.getElementById('play').onclick = () => startRun();
   document.getElementById('reto').onclick = () => {
@@ -171,19 +166,36 @@ function manaSlots(build) {
 const SUIT_FILE = { O: 'oros', C: 'copas', E: 'espadas', B: 'bastos' };
 const FIG_FILE = { 8: 'sota', 9: 'caballo', 10: 'rey' };
 
-// Naipe ilustrado (sistema de cartas §7.2): papel + marco grabado + número de valor GRANDE +
-// emblema de palo + (para 8/9/10) ilustración de figura. Mata = marco legendario dorado.
+// Disposición tradicional de PINTAS del naipe español (valor = nº de emblemas). [x%, y%] por posición.
+const PIP_LAYOUT = {
+  1: [[50, 50]],
+  2: [[50, 27], [50, 73]],
+  3: [[50, 22], [50, 50], [50, 78]],
+  4: [[33, 27], [67, 27], [33, 73], [67, 73]],
+  5: [[33, 27], [67, 27], [50, 50], [33, 73], [67, 73]],
+  6: [[33, 24], [67, 24], [33, 50], [67, 50], [33, 76], [67, 76]],
+  7: [[30, 22], [70, 22], [27, 50], [50, 50], [73, 50], [30, 78], [70, 78]],
+};
+
+// Naipe español ilustrado (sistema §7.2): papel + marco grabado + PINTAS (valor = nº de emblemas,
+// 1–7) o FIGURA ilustrada (Sota/Caballo/Rey = 8/9/10) + índice de esquina. Mata = marco dorado.
 function cardHTML(c, zona, i, selected, hint, oroBloq) {
   const figName = NOMBRE_VALOR[c.v];           // 'Sota'|'Caballo'|'Rey' o undefined
   const figFile = FIG_FILE[c.v];
   const suit = SUIT_FILE[c.palo];
   const cls = ['carta', `p-${c.palo}`, selected ? 'sel' : '', hint ? 'hint' : '',
     c.mata ? 'mata' : '', figFile ? 'figura' : '', oroBloq ? 'oro-bloq' : ''].filter(Boolean).join(' ');
-  const art = figFile
-    ? `<span class="card-fig" style="background-image:url('assets/art/fig-${figFile}.png')"></span>`
-    : `<span class="card-pip" style="background-image:url('assets/art/suit-${suit}.png')"></span>`;
+  let art;
+  if (figFile) {
+    art = `<span class="card-fig" style="background-image:url('assets/art/fig-${figFile}.png')"></span>`;
+  } else {
+    const layout = PIP_LAYOUT[c.v] || PIP_LAYOUT[1];
+    const pips = layout.map(([x, y]) =>
+      `<i class="pip" style="left:${x}%;top:${y}%;background-image:url('assets/art/pip/${suit}.png')"></i>`).join('');
+    art = `<span class="card-pips" data-n="${c.v}">${pips}</span>`;
+  }
   const idx = (pos) => `<span class="idx idx-${pos}"><b>${c.v}</b>` +
-    `<i class="suit-mini" style="background-image:url('assets/art/suit-${suit}.png')"></i></span>`;
+    `<i class="suit-mini" style="background-image:url('assets/art/pip/${suit}.png')"></i></span>`;
   return `<div class="${cls}" data-zona="${zona}" data-i="${i}" aria-label="${c.v} de ${suit}">
     <span class="card-paper"></span>
     ${art}
@@ -463,7 +475,8 @@ fx.initCanvas();
 initAnalytics();
 installErrorCapture();
 // PWA: registra el service worker (carga repetida instantánea + offline). Silencioso si falla.
-if ('serviceWorker' in navigator) {
+// `?nosw` en la URL lo desactiva (afordancia de QA para no servir shell cacheado durante desarrollo).
+if ('serviceWorker' in navigator && !/[?&]nosw\b/.test(location.search)) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(
       () => track('pwa_sw_ready', {}),

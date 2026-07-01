@@ -8,7 +8,7 @@
 //
 // Sin PII: id de cliente anónimo (uuid en localStorage), nada de nombres/emails. Apto LATAM/USA.
 
-export const VERSION = '0.6.0';            // se incrementa por release; viaja en cada evento
+export const VERSION = '0.7.0';            // se incrementa por release; viaja en cada evento
 // NOTA: al cambiar cualquier archivo del shell, sube TAMBIÉN VERSION en sw.js → el caché se refresca
 // atómicamente (todo el shell junto) y evita mismatch entre módulos (p.ej. main.js nuevo + audio.js viejo).
 const LS_CID = 'ordago.cid';
