@@ -1,7 +1,7 @@
 // ÓRDAGO — service worker. Estrategia: stale-while-revalidate del shell del juego.
 // Objetivo: cargas repetidas instantáneas (retención) + jugable offline. Sin sorpresas: la versión
 // del caché se ata a VERSION del juego, así un release nuevo invalida el caché viejo limpiamente.
-const VERSION = '0.5.0';
+const VERSION = '0.6.0';
 const CACHE = 'ordago-' + VERSION;
 const SHELL = [
   './', './index.html', './style.css',
